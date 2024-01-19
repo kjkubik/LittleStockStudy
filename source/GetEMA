@@ -35,7 +35,7 @@ ticker_df = df[df["Ticker"].str.contains(ticker)]
 print(ticker_df)
 
 # what is ticker_df's size?
-ticker_df_size = ticker_df.size
+ticker_df_size = len(ticker_df)
 print(ticker_df_size)
 
 
