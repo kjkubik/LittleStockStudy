@@ -3,7 +3,8 @@ import pandas as pd
 from numpy import record
 import datetime
 import time
-# from config import 
+from config import polygon_key
+
 
 
 def ts_to_datetime(ts) -> str:
