@@ -1,0 +1,65 @@
+from polygon import RESTClient
+import pandas as pd
+from numpy import record
+import csv
+import datetime
+import time
+
+# before running program, user must assign smoothing and days and TupleIndex = 0
+tupleIndex = 0
+smoothing = 2
+firstEMADays = 5
+secondEMADays = 10
+
+# read specific columns of csv file using Pandas
+df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
+print(df)
+
+# get ticker
+ticker = df.iloc[0,0]
+print(ticker)
+
+# get start date
+startDate = df.iloc[0,1]
+print(startDate)
+
+# to calculate EMA(yesterday), we need to find the SMA for a given number of days
+firstSMA = df.iloc[0:firstEMADays,2].sum()/firstEMADays
+print(firstSMA)
+
+secondSMA = df.iloc[0:secondEMADays,2].sum()/secondEMADays
+print(secondSMA)
+
+# create a df for first stock ticker
+ticker_df = df[df["Ticker"].str.contains(ticker)]
+print(ticker_df)
+
+# what is ticker_df's size?
+ticker_df_size = ticker_df.size
+print(ticker_df_size)
+
+
+# for each ticker create add to a df 
+#if ticker is the same as previous ticker or if today's date is the same as yesterday, you are done with this ticker
+
+
+
+
+
+# the formula for EMA is this:
+# For days = n take n day's prices and divide them by n. This gives you the SMA (Simple Moving Average) - THIS IS THE FIRST EMA FOR YESTERDAY.
+# EMA(today) = (value(today) * (smoothing/(1+days)) + EMA(yesterday) * (1 - (smothing/(1+days))) 
+
+# Example: Say you want the EMA for days = 5 with a smoothing factor of 2 
+# and the closing price of stock ABC is {(20240105,87.00), (20240106,90.00), (20240107,91.00), (20240108,88.00), (20240109,92.00)} <-- concern dates are needed for visualization!
+# SMA = (87 + 90 + 91 + 88 + 92)/5 = 89.6 => EMA(yesterday)
+# Assign day 2 to day 1, day 3 to day 2, day 4 to day 3, day 5 to day 4. (you have to do this before reading the next closing price.)
+
+
+# Read the next record. (closing price is (20240110,90.00)
+# Assign next record's closing price to day 5.
+# Calculate EMA(today) = (90 * (2/6) + 89.6 * (1 - (2/6))) = 89.73
+# move date and EMA(today) to tuple (immutable!!!). EMATuple = ((date,EMA)) t[0] = ((20240110,89.73))
+# add 1 to the TupleIndex
+# Assign day 2 to day 1, day 3 to day 2, day 4 to day 3, day 5 to day 4. (you have to do this before reading the next closing price.)
+# What about inflaction? how do you account for inflation
