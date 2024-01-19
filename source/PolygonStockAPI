@@ -3,9 +3,7 @@ import pandas as pd
 from numpy import record
 import datetime
 import time
-from config import polygon_key
-
-
+from config import stock_key
 
 def ts_to_datetime(ts) -> str:
     return datetime.datetime.fromtimestamp(ts / 1000.0).strftime('%Y-%m-%d')
