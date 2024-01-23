@@ -11,32 +11,85 @@ smoothing = 2
 firstEMADays = 5
 secondEMADays = 10
 
-# read specific columns of csv file using Pandas
-df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
-print(df)
+# INPUT tickers
+tickers_df = pd.read_csv("resources/InputTickers.csv")
+# print(tickers_df)
+# isolate ticker, date, and closing prices in dataframe
+stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
+print(stock_prices_df)   
+# OUTPUT
+output = open(f"resources/OutputEMAs.csv", "w")
+    
+def main():
+    # iterating through input stocks
+    for record, row in tickers_df.iterrows():
+        
+        present_ticker = row['Ticker']
+        print('first forloop:', present_ticker)
+        
+        sma_flag = True
+        
+        # count the number of occurances having the present ticker
+        count_present_tickers_rows = stock_prices_df['Ticker'].value_counts()[present_ticker]
+        print(count_present_tickers_rows)
+        
+        print(stock_prices_df)
+        
+        # # based on present ticker, create df
+        # present_ticker_df = stock_prices_df.loc[stock_prices_df['Ticker']] == present_ticker
+        # print (present_ticker_df)
+            
+        for record, row in stock_prices_df.iterrows():
+            
+            if sma_flag == True:
+                # get ticker
+                ticker = stock_prices_df.iloc[0,0]
+                print (ticker)
+                get_SMA(firstEMADays, secondEMADays, present_ticker, stock_prices_df)            
+                sma_flag = False
+            #else:
+            
+            
+            # if present_ticker != ticker:
+            #    present_ticker = ticker 
+            #    print('second forloop:', ticker)
+#                 if present_ticker == ticker: 
 
-# get ticker
-ticker = df.iloc[0,0]
-print(ticker)
+                    
 
-# get start date
-startDate = df.iloc[0,1]
-print(startDate)
+# to calculate EMA(yesterday), we need to find the SMA for each given number of days
+def get_SMA(firstEMADays, secondEMADays, present_ticker, stock_prices_df):
+    
+    firstSMA = stock_prices_df.iloc[0:firstEMADays,2].sum()/firstEMADays
+    print(firstSMA)
 
-# to calculate EMA(yesterday), we need to find the SMA for a given number of days
-firstSMA = df.iloc[0:firstEMADays,2].sum()/firstEMADays
-print(firstSMA)
+    secondSMA = stock_prices_df.iloc[0:secondEMADays,2].sum()/secondEMADays
+    print(secondSMA)
 
-secondSMA = df.iloc[0:secondEMADays,2].sum()/secondEMADays
-print(secondSMA)
+    
+    
+    # ticker_held =  row['Ticker']
+    # print(ticker_held)
+    
+    # if stock_df['Ticker'].value_counts()[ticker_held]
+    
+        
+        
+    
 
-# create a df for first stock ticker
-ticker_df = df[df["Ticker"].str.contains(ticker)]
-print(ticker_df)
+    # # get start date
+    # startDate = df.iloc[0,1]
+    # print(startDate)
 
-# how many rows are there?
-ticker_df_size = len(ticker_df)
-print(ticker_df_size)
+    
+
+# # create a df for first stock ticker
+# ticker_df = df[df["Ticker"].str.contains(ticker)]
+# print(ticker_df)
+
+# # how many rows are there?
+# ticker_df_size = len(ticker_df)
+# print(ticker_df_size)
 
 
 # for each ticker create add to a df 
@@ -63,3 +116,7 @@ print(ticker_df_size)
 # add 1 to the TupleIndex
 # Assign day 2 to day 1, day 3 to day 2, day 4 to day 3, day 5 to day 4. (you have to do this before reading the next closing price.)
 # What about inflaction? how do you account for inflation
+
+# MAIN
+if __name__ == '__main__':
+    main()
