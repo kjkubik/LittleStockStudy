@@ -23,7 +23,8 @@ def main():
     record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions,PercentageChange\n"
     output.write(record)
     
-    record_count = 1  # Used to eliminate "429 Client Error: Too Many Requests for url"
+    # Used to eliminate "429 Client Error: Too Many Requests for url"
+    record_count = 1  
     
     # iterating through input stocks
     for record, row in tickers_df.iterrows():
