@@ -19,21 +19,36 @@ stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPr
 print(stock_prices_df)   
 # OUTPUT
 output = open(f"resources/OutputEMAs.csv", "w")
+
+
+# get the firstEMADays records into df
+# get the records not in the firstEMADays into a df
+  
+# get the firstEMADays records into df
+# get the records not in the firstEMADays into a df
+
+SMA = stock_prices_df.groupby(["Ticker"]).mean()["Close"]
+print (SMA)
+
+# try this next...I think it will work but it is going to have to be put in a forloop 
+#df_head = df.head()
+#df_last_3 = df.tail(3) 
     
 def main():
     # iterating through input stocks
     for record, row in tickers_df.iterrows():
         
         present_ticker = row['Ticker']
-        print('first forloop:', present_ticker)
+        #print (present_ticker)
+        #print('first forloop:', present_ticker)
         
         sma_flag = True
         
         # count the number of occurances having the present ticker
         count_present_tickers_rows = stock_prices_df['Ticker'].value_counts()[present_ticker]
-        print(count_present_tickers_rows)
+        #print(count_present_tickers_rows)
         
-        print(stock_prices_df)
+        #print(stock_prices_df)
         
         # # based on present ticker, create df
         # present_ticker_df = stock_prices_df.loc[stock_prices_df['Ticker']] == present_ticker
@@ -44,7 +59,7 @@ def main():
             if sma_flag == True:
                 # get ticker
                 ticker = stock_prices_df.iloc[0,0]
-                print (ticker)
+                #print (ticker)
                 get_SMA(firstEMADays, secondEMADays, present_ticker, stock_prices_df)            
                 sma_flag = False
             #else:
@@ -61,10 +76,10 @@ def main():
 def get_SMA(firstEMADays, secondEMADays, present_ticker, stock_prices_df):
     
     firstSMA = stock_prices_df.iloc[0:firstEMADays,2].sum()/firstEMADays
-    print(firstSMA)
+    #print(firstSMA)
 
     secondSMA = stock_prices_df.iloc[0:secondEMADays,2].sum()/secondEMADays
-    print(secondSMA)
+    #print(secondSMA)
 
     
     
