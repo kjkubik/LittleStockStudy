@@ -7,7 +7,7 @@ from config import stock_key
 
 def ts_to_datetime(ts) -> str: return datetime.datetime.fromtimestamp(ts / 1000.0).strftime('%Y-%m-%d')
 
-from_ = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d')
+from_ = (datetime.datetime.now() - datetime.timedelta(days=365)).strftime('%Y-%m-%d')
 to = datetime.datetime.now().strftime('%Y-%m-%d')
 time_span = "day" # "minute"
 
