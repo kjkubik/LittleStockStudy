@@ -1,0 +1,36 @@
+import pandas as pd
+from numpy import record
+
+# INPUT
+#WordInBible_df = pd.read_csv("resources/EveryWordInTheBible.csv")
+#print(WordInBible_df)
+
+WordInBible_df = pd.read_csv("resources/InputReversedING.csv")
+
+# OUTPUT
+#output = open(f"resources/ReversedBibleWords.csv", "w")
+output = open(f"resources/ingWords.csv", "w")
+
+# # This reverses the order of the dataframe
+# rev_txt = WordInBible_df.index[::-1]
+# print(rev_txt)
+   
+# # This reverses a string
+# rev_txt = WordInBible_df[::-1]
+# print(rev_txt)
+
+def reversed_string(word):    
+    result = ""
+    for char in word:
+        result = char + result
+    return result
+
+# iterating through input Bible words
+for record, row in WordInBible_df.iterrows():
+    word = row['WORD']
+    reverse = reversed_string(word)
+    print(reverse)
+    outputRecord = f"{reverse}\n"
+    output.write(outputRecord)
+    
+    
