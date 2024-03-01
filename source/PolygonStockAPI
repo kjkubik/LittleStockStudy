@@ -3,6 +3,7 @@ import pandas as pd
 from numpy import record
 import datetime
 import time
+#import GetSMA
 from config import stock_key
 
 def ts_to_datetime(ts) -> str: return datetime.datetime.fromtimestamp(ts / 1000.0).strftime('%Y-%m-%d')
@@ -11,7 +12,7 @@ from_ = (datetime.datetime.now() - datetime.timedelta(days=365)).strftime('%Y-%m
 to = datetime.datetime.now().strftime('%Y-%m-%d')
 time_span = "day" # "minute"
 
-def main():
+def AccessPolygon():
     # INPUT
     tickers_df = pd.read_csv("resources/InputTickers.csv")
     #print(tickers_df.head())
@@ -20,7 +21,7 @@ def main():
     output = open(f"resources/StockPrices.csv", "w")
     
     # HEADER RECORD
-    record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions,PercentageChange\n"
+    record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions\n"
     output.write(record)
     
     # Used to eliminate "429 Client Error: Too Many Requests for url"
@@ -58,4 +59,8 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
     
 # MAIN
 if __name__ == '__main__':
-    main()
+    print('I am here')
+    # Access the API giving you stock prices and write to file (soon we'll get these to a table :O)
+    AccessPolygon()
+    # Get SMAs for each stock 
+    exec(open("source/GetSMA").read())

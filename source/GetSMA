@@ -1,0 +1,87 @@
+import pandas as pd
+from numpy import record
+from numba import njit
+import csv
+import datetime
+import time
+from pandas.core.indexes.datetimes import date_range
+
+day_range1 = 20
+day_range2 = 50
+
+
+# INPUT tickers
+tickers_df = pd.read_csv("resources/InputTickers.csv")
+print(tickers_df)
+
+# INPUT: we are isolate columns ticker, date, and closing price into a dataframe
+stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
+print(stock_prices_df)   
+
+# OUTPUT
+
+# Test usage:
+# data = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+# day_range1 = 3
+# day_range2 = 4
+
+# Test results for day_range1 = 3 should be [20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0]
+# Test results for day_range2 = 4 should be [25.0, 35.0, 45.0, 55.0, 65.0, 75.0, 85.0]
+
+# Calculate SMA for a stock
+def calculate_sma(data, day_range,count):
+    
+    # initialize SMA List
+    sma_values = []
+    print (day_range)
+       
+    for i in range(len(data) - day_range + 1):
+        print(count)
+        if count > day_range: 
+            window = data[i:i+day_range]
+            sma = round((sum(window) / day_range),2)
+            sma_values.append(sma)
+            count = count + 1
+            print(count)
+        else:
+            print ('I am here')
+            sma_values.append(0.00) 
+            count = count + 1
+            print (count)
+    return sma_values    
+
+def get_SMA():
+
+    closing_list = []
+    sma_list = []
+    count1 = 0
+    count2 = 0
+    # iterating through input stocks to get SMA
+    for record, row in tickers_df.iterrows():
+        
+        
+        present_ticker = row['Ticker']
+        
+        
+        print ('present ticker:' + present_ticker)
+
+        closing_list = stock_prices_df[stock_prices_df['Ticker'] == present_ticker]['Close'].tolist()
+        print (closing_list)
+        
+        sma_list = calculate_sma(closing_list, day_range1,count1)
+        print (sma_list)
+        
+        sma_list = calculate_sma(closing_list, day_range2,count2)
+        print (sma_list)
+
+        # append sma list to stock_prices_df
+        stock_prices_df ['SMA'] = sma_list
+        print(stock_prices_df)        
+        
+    
+    
+# MAIN
+if __name__ == '__main__':
+    get_SMA()
+    
+    
