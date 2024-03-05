@@ -1,3 +1,9 @@
+###############################################################################
+# Purpose: For each stock InputTickers, we:                                   #
+#             1) create a csv file using stock's ticker                       #
+#             2) create header record                                         #
+#             3) access API to get all stock data we can from Polygon Stock   #
+###############################################################################
 from polygon import RESTClient
 import pandas as pd
 from numpy import record
@@ -13,38 +19,40 @@ to = datetime.datetime.now().strftime('%Y-%m-%d')
 time_span = "day" # "minute"
 
 def AccessPolygon():
-    # INPUT
-    tickers_df = pd.read_csv("resources/InputTickers.csv")
-    #print(tickers_df.head())
-    
-    # OUTPUT
-    output = open(f"resources/StockPrices.csv", "w")
-    
-    # HEADER RECORD
-    record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions\n"
-    output.write(record)
-    
+    # INPUT tickers
+    # tickers_df = pd.read_csv("resources/InputTickers.csv")
+
     # Used to eliminate "429 Client Error: Too Many Requests for url"
-    record_count = 1  
+    record_count = 1 
     
-    # iterating through input stocks
-    for record, row in tickers_df.iterrows():
+    with open("resources/InputTickers.csv") as inputFile:
         
-        ticker =  row['Ticker']
-        get_stock_price(output, stock_key, ticker, time_span, from_, to)
+        lines = [line.split('\n') for line in inputFile]
+        print (lines)
+    for row in lines:
+        for elem in row:
+            if elem == "" or elem == 'Ticker':
+                continue
+            with open("resources/StockData/" + elem + ".csv", "w") as output:
+                # output.writelines(elem)
+                record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions\n"
+                output.write(record)
+                ticker =  elem
+                print (ticker)
+                get_stock_price(output, stock_key, ticker, time_span, from_, to)
+                
+                # prevents client error 429
+                record_count = record_count + 1
         
-        # prevents client error 429
-        record_count = record_count + 1
-        
-        if record_count > 5: 
-            record_count = 1
-            print(f"Wait one minute before retrieving next five stocks.")
-            time.sleep(90) # Sleep for 62 seconds
+                if record_count > 5: 
+                    record_count = 1
+                    print(f"Wait one minute before retrieving next five stocks.")
+                    time.sleep(90) # Sleep for 62 seconds
     
     output.close()
     print("Get_Stock_Price has completed.")
     print("Boooo-yaaaaahhhh!\n")
-
+            
 def get_stock_price(output, client_key, ticker, time_span, from_, to):
     
     print(f"Retrieving {ticker} data.") 
@@ -58,13 +66,18 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
             record = f"{ticker},{dt},{result['o']},{result['h']},{result['l']},{result['c']},{result['v']}," \
                      f"{result['vw']},{result['n']}\n"
             output.write(record)
-    
+
 # MAIN
 if __name__ == '__main__':
     print('I am here')
     # Access the API giving you stock prices and write to file (soon we'll get these to a table :O)
+    AccessPolygon()                
+    
+    # MAIN
+if __name__ == '__main__':
+    print('I am here')
+    # Access the API giving you stock prices and write to file (soon we'll get these to a table :O)
     AccessPolygon()
-    # break up the very large file so that you can do multiprocessing
     
     # Get SMAs for each stock 
     # use this later: exec(open("source/GetSMA").read())

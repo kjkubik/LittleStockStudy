@@ -1,4 +1,9 @@
-# Purpose: create files based on InputTickers.csv
+###############################################################################
+# Purpose: For each stock InputTickers, we:                                   #
+#             1) create a csv file using stock's ticker                       #
+#             2) create header record                                         #
+#             3) access API to get all stock data we can from Polygon Stock   #
+###############################################################################
 from polygon import RESTClient
 import pandas as pd
 from numpy import record
