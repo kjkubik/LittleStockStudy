@@ -29,11 +29,13 @@ def AccessPolygon():
     
     # iterating through input stocks
     for record, row in tickers_df.iterrows():
+        
         ticker =  row['Ticker']
         get_stock_price(output, stock_key, ticker, time_span, from_, to)
-        record_count = record_count + 1
         
         # prevents client error 429
+        record_count = record_count + 1
+        
         if record_count > 5: 
             record_count = 1
             print(f"Wait one minute before retrieving next five stocks.")
@@ -48,7 +50,7 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
     print(f"Retrieving {ticker} data.") 
     with RESTClient(client_key) as client:
         
-        # for more information on calling this go to Polygon website
+        # for parameter information on calling, go to Polygon website
         resp = client.stocks_equities_aggregates(ticker, 1, time_span, from_, to, unadjusted=False)
         
         for result in resp.results:
@@ -62,5 +64,7 @@ if __name__ == '__main__':
     print('I am here')
     # Access the API giving you stock prices and write to file (soon we'll get these to a table :O)
     AccessPolygon()
+    # break up the very large file so that you can do multiprocessing
+    
     # Get SMAs for each stock 
-    exec(open("source/GetSMA").read())
+    # use this later: exec(open("source/GetSMA").read())
