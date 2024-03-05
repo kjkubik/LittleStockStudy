@@ -1,3 +1,4 @@
+# This module will be used to get the SMA for every
 import matplotlib.pyplot as plt
 import pandas as pd
 from numpy import record

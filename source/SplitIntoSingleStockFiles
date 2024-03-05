@@ -1,0 +1,21 @@
+# Purpose: create files based on InputTickers.csv
+import pandas as pd
+from numpy import record
+import datetime
+import time
+
+# INPUT tickers
+tickers_df = pd.read_csv("resources/InputTickers.csv")
+
+i = 1
+with open("resources/InputTickers.csv") as textFile:
+    
+    lines = [line.split('\n') for line in textFile]
+    print (lines)
+for row in lines:
+    for elem in row:
+        if elem == "" or elem == 'Ticker':
+            continue
+        with open("resources/" + elem + ".csv", "w") as newLetter:
+            newLetter.writelines(elem)
+            i += 1
