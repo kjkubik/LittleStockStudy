@@ -17,8 +17,8 @@ tickers_df = pd.read_csv("resources/InputTickers.csv")
 #print(tickers_df)
 
 # INPUT: we are isolate columns ticker, date, and closing price into a dataframe
-stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
-#print(stock_prices_df)   
+stock_prices_df = pd.read_csv("resources/StockData/ALTO.csv", usecols=['Ticker','Date','Close'])
+print(stock_prices_df)   
 
 # OUTPUT
 
@@ -35,6 +35,7 @@ def calculate_sma(data, day_range):
     
     # initialize SMA List
     sma_values = []
+    #sma_values.append(0.00)
     # print (day_range)
     # print (len(data))   
     # print (len(data) - (len(data) - day_range + 1))
@@ -57,8 +58,8 @@ def get_SMA():
     closing_list = []
     sma_list1 = []
     sma_list2 = []
-    date_list = []
-        
+    date_list1 = []
+    date_list2 = []    
     # iterating through input stocks to get SMA
     for record, row in tickers_df.iterrows():
         # what 

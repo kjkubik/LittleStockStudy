@@ -14,7 +14,7 @@ from config import stock_key
 
 def ts_to_datetime(ts) -> str: return datetime.datetime.fromtimestamp(ts / 1000.0).strftime('%Y-%m-%d')
 
-from_ = (datetime.datetime.now() - datetime.timedelta(days=700)).strftime('%Y-%m-%d')
+from_ = (datetime.datetime.now() - datetime.timedelta(days=365)).strftime('%Y-%m-%d')
 to = datetime.datetime.now().strftime('%Y-%m-%d')
 time_span = "day" # "minute"
 
@@ -68,12 +68,6 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
             output.write(record)
 
 # MAIN
-if __name__ == '__main__':
-    print('I am here')
-    # Access the API giving you stock prices and write to file (soon we'll get these to a table :O)
-    AccessPolygon()                
-    
-    # MAIN
 if __name__ == '__main__':
     print('I am here')
     # Access the API giving you stock prices and write to file (soon we'll get these to a table :O)
