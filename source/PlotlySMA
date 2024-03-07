@@ -1,0 +1,38 @@
+import pandas as pd
+from numpy import record
+from numba import njit
+import csv
+import os
+import plotly.express as px
+
+
+day_range1 = 40
+day_range2 = 50
+
+def get_SMA():
+    
+    # assign directory
+    directory = 'resources/StockData'
+    
+    # iterate over files in directory
+    for filename in os.listdir(directory):
+        
+        f = os.path.join(directory, filename)
+        
+        # checking if it is a file
+        if os.path.isfile(f):
+            print(f)
+            stock_prices_df = pd.read_csv(f, usecols=['Date','Volume'])
+            print(stock_prices_df)   
+            
+            # get the SMA for both day_range1 and day_range2
+            
+            singleStockdict = stock_prices_df.to_dict()
+            print (singleStockdict)
+            
+            fig = px.line(singleStockdict,x="Date", y="Volume", title = 'Volume Chart' + filename)
+            fig.show() 
+        
+# MAIN
+if __name__ == '__main__':
+    get_SMA()        
