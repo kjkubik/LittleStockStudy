@@ -14,8 +14,9 @@ from numpy import record
 import datetime
 import time
 from config import stock_key
+from TableFunctions import stocks_to_tables
 
-def process_this():
+def daily_run():
     print('Starting GetAllStocksData')
     
     # get stocks daily data
@@ -26,7 +27,7 @@ def process_this():
     print('We have all Daily data.')
     
     # preventing client error 429 
-    time.sleep(60) 
+    # TURN BACK ON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!time.sleep(60) 
     
     access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
                   to = datetime.datetime.now().strftime('%Y-%m-%d'), 
@@ -36,12 +37,12 @@ def process_this():
     
     print("GetAllStocksData has completed.")
     print("Boooo-yaaaaahhhh!\n")
+        
+    # # TODO: BACKUP FILES
+    #     outputMASTER = open("resources/HistoricalData/StockPricesMinuteMaster.csv", "a")    
+    #     outputMASTER = open("resources/HistoricalData/StockPricesDailyMaster.csv", "a")
 
-# # TODO: BACKUP FILES
-#     outputMASTER = open("resources/HistoricalData/StockPricesMinuteMaster.csv", "a")    
-#     outputMASTER = open("resources/HistoricalData/StockPricesDailyMaster.csv", "a")
-
-
+    stocks_to_tables()
 ######################################################################################
 # Showing the main routine you call doesn't need to be named 'main'.                 #
 # This is one way your code can be self documenting. Also, place subroutines in the  #
@@ -109,7 +110,7 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
                 ms = int(result["t"])
                 timestamp_sec = ms/1000
                 dt = datetime.datetime.fromtimestamp(timestamp_sec) # access fromtimestamp method directly - you cannot do what you do in 
-                print(dt)
+                #print(dt)
                 record = f"{ticker},{dt},{result['o']},{result['h']},{result['l']},{result['c']},{result['v']}," \
                      f"{result['vw']},{result['n']}\n"
                 output.write(record)
@@ -132,4 +133,5 @@ def ts_to_datetime(ts) -> str:
 ######################################################################################
 if __name__ == '__main__':
     
-    process_this()
+    daily_run()
+    
