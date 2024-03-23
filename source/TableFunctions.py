@@ -1,18 +1,15 @@
 import csv
 import psycopg2
+import datetime
+#from config import dbname, password, host, port
+from config import dbconnection
 
 def move_csv_to_daily_stock_data(file_date,time_frame):
     
     print(file_date)
     
     # Establish a connection to the PostgreSQL database
-    conn = psycopg2.connect(
-        dbname="Stock_Data",
-        user="postgres",
-        password="P05t1n9!",
-        host="localhost",
-        port="5432"
-    )
+    conn = psycopg2.connect(dbconnection)
 
     # Create a cursor object
     cur = conn.cursor()
@@ -39,4 +36,14 @@ def move_csv_to_daily_stock_data(file_date,time_frame):
     # Close the cursor and connection
     cur.close()
     conn.close()         
+
+# MAIN
+if __name__ == '__main__':
     
+    print('Starting DatatoTables')
+    
+    # move_csv_to_daily_stock_data(file_date = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
+    #                             time_frame = "Minutes")
+    
+    move_csv_to_daily_stock_data(file_date = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
+                                time_frame = "Daily")
