@@ -22,7 +22,7 @@ def get_SMA():
         # checking if it is a file
         if os.path.isfile(f):
             print(f)
-            stock_prices_df = pd.read_csv(f, usecols=['Date','Volume'])
+            stock_prices_df = pd.read_csv(f, usecols=['Date','Close'])
             print(stock_prices_df)   
             
             # get the SMA for both day_range1 and day_range2
@@ -30,7 +30,7 @@ def get_SMA():
             singleStockdict = stock_prices_df.to_dict()
             print (singleStockdict)
             
-            fig = px.line(singleStockdict,x="Date", y="Volume", title = 'Volume Chart' + filename)
+            fig = px.line(singleStockdict,x="Date", y="Close", title = 'Close Chart' + filename)
             fig.show() 
         
 # MAIN

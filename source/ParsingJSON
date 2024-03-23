@@ -1,0 +1,45 @@
+import json
+
+with open("resources/AllStocks.txt") as strings:
+    line = strings.read().replace("},{", "\n")
+    with open("resources/ParsedStocks.txt", "w") as output:
+        output.write(line)
+        
+output.close()
+
+
+# open("resources/AllStocks.txt")
+# # some JSON:
+# const_data = '{s:"AA",n:"Alcoa Corporation",i:"Aluminum",m:5474754048},{s:"AACG",n:"ATA Creativity Global",i:"Education & Training Services",m:49300200}'
+
+# x = const_data.split("},{") 
+# #print(x)
+
+
+# for i in x: 
+#     print(i)
+    
+#data = json.load(const_data)
+# Iterating through the json
+# list
+#for i in data['const data']:
+    #print(i)
+
+# We have a JSON string stored in a variable ’employee’ and we convert this JSON string to a Python object
+# # Python program to convert JSON to Python
+# import json
+# 
+# # JSON string
+# employee ='{"id":"09", "name": "Nitin", "department":"Finance"}'
+ 
+# # Convert string to Python dict
+# employee_dict = json.loads(employee)
+# print(employee_dict)
+ 
+# print(employee_dict['name'])
+#------------------------------------
+# parse x:
+# y = json.loads(const_data)
+
+# the result is a Python dictionary:
+#print(y["s"])

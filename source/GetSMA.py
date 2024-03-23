@@ -1,0 +1,155 @@
+# This module will be used to get the SMA for every
+import matplotlib.pyplot as plt
+import pandas as pd
+from numpy import record
+from numba import njit
+import csv
+import datetime
+import time
+from pandas.core.indexes.datetimes import date_range
+
+day_range1 = 40
+day_range2 = 50
+
+
+# INPUT tickers
+tickers_df = pd.read_csv("resources/InputTickers.csv")
+#print(tickers_df)
+
+# INPUT: we are isolate columns ticker, date, and closing price into a dataframe
+stock_prices_df = pd.read_csv("resources/StockData/ALTO.csv", usecols=['Ticker','Date','Close'])
+print(stock_prices_df)   
+
+# OUTPUT
+
+# Test usage:
+# data = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+# day_range1 = 3
+# day_range2 = 4
+
+# Test results for day_range1 = 3 should be [20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0]
+# Test results for day_range2 = 4 should be [25.0, 35.0, 45.0, 55.0, 65.0, 75.0, 85.0]
+
+# Calculate SMA for a stock
+def calculate_sma(data, day_range):
+    
+    # initialize SMA List
+    sma_values = []
+    #sma_values.append(0.00)
+    # print (day_range)
+    # print (len(data))   
+    # print (len(data) - (len(data) - day_range + 1))
+    
+    # Adding 0.00 at the front of the list so that it matches the data frame
+    for i in range(len(data) - (len(data) - day_range + 1)): 
+         sma_values.append(0.00)
+  #       print (sma_values)
+
+        
+    for i in range(len(data) - day_range + 1):
+        window = data[i:i+day_range]
+        sma = round((sum(window) / day_range),2)
+        sma_values.append(sma)
+        
+    return sma_values    
+
+def get_SMA():
+
+    closing_list = []
+    sma_list1 = []
+    sma_list2 = []
+    date_list1 = []
+    date_list2 = []    
+    # iterating through input stocks to get SMA
+    for record, row in tickers_df.iterrows():
+        # what 
+        present_ticker = row['Ticker']
+        print ('present ticker:' + present_ticker)
+        
+        # move only present ticker into a dataframe
+        present_ticker_df = stock_prices_df[stock_prices_df['Ticker'] == present_ticker]
+        print(present_ticker_df)
+
+        
+        # X-AXIS: move present ticker's closing prices to a list
+        date_list1 = present_ticker_df[present_ticker_df['Ticker'] == present_ticker]['Date'].tolist()
+        print (date_list1)
+        date_list2 = present_ticker_df[present_ticker_df['Ticker'] == present_ticker]['Date'].tolist()
+        print (date_list2)
+        # move present ticker's closing prices to a list
+        closing_list = present_ticker_df[present_ticker_df['Ticker'] == present_ticker]['Close'].tolist()
+        print (closing_list)
+
+        # CHANGE SO THAT USER CAN ENTER AS MANY DAY RANGES AS THEY WANT 
+        # THE USER WILL ENTER THEN LIKE THIS: 10,20,30,53,72
+        # ON THE FRONTEND, THIS DATA WILL NEED TO BE TRANSFORMED INTO A LIST: [10,20,30,53,72]
+             
+        # Y-AXIS: get all SMA's into list for day range1
+        sma_list1 = calculate_sma(closing_list, day_range1)
+        print (sma_list1)
+
+        # graph first line
+        # plotting the points 
+        plt.plot(date_list1, sma_list1, label = "20 Day SMA")
+        
+        # # naming the x axis
+        # plt.xlabel('Date')
+        # # naming the y axis
+        # plt.ylabel('SMA')
+        
+        # # giving a title to my graph
+        # plt.title('SMA for ' + present_ticker)
+
+        # # show a legend on the plot
+        # plt.legend()
+        
+        # # function to show the plot
+        # plt.show()
+
+        # # append sma list to stock_prices_df
+        # present_ticker_df['SMA'] = sma_list
+        # print(present_ticker_df)       
+        # # append day range to each record of stock_prices_df
+        # present_ticker_df['Day Range'] = day_range1
+        # print(present_ticker_df)      
+        
+        # This isn't right because X and Y AXIS must be separated but use for insertion into table.
+        # list_date_SME = present_ticker_df[['Date','SMA']].values.tolist()
+        # print(list_date_SME)
+        
+        # now you have all the information for first date range...insert to table.
+        
+        # second specified day range
+        sma_list2 = calculate_sma(closing_list, day_range2)
+        print (sma_list2)
+        # plotting the points 
+        plt.plot(date_list2, sma_list2, label = "50 Day SMA")
+        
+        # naming the x axis
+        plt.xlabel('Date')
+        # naming the y axis
+        plt.ylabel('SMA')
+        
+        # giving a title to my graph
+        plt.title('SMA for ' + present_ticker)
+        
+        # show a legend on the plot
+        plt.legend()
+        
+        # function to show the plot
+        plt.show()
+        
+        # append sma list to stock_prices_df
+        # present_ticker_df['SMA'] = sma_list
+        # print(present_ticker_df)       
+        # present_ticker_df['Day Range'] = day_range2
+        # print(present_ticker_df)
+        # list_date_SME = present_ticker_df[['Date','SMA']].values.tolist()
+        # print(list_date_SME)       
+    
+        # now you have all the information for 2nd date range...insert to table.
+# MAIN
+if __name__ == '__main__':
+    get_SMA()
+    
+    
