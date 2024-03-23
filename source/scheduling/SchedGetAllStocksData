@@ -1,0 +1,31 @@
+# scheduler.py
+import schedule
+import time
+from GetAllStocksDatas import process_this  # Importing the process_this function from GetAllStocksData
+from config import stock_key
+
+# Schedule the task to run daily at a specific time (e.g., 9:00 AM)
+schedule.every().day.at("08:54").do(process_this)
+
+# Keep the program running to allow scheduled tasks to execute
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+    
+
+
+# import schedule
+# import time
+
+# def daily_task():
+#     print("Running daily task!")
+
+# # Schedule the task to run daily at a specific time (e.g., 9:00 AM)
+# schedule.every().day.at("09:00").do(daily_task)
+
+# # Keep the program running to allow scheduled tasks to execute
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
+    
+
