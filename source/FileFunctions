@@ -1,3 +1,9 @@
+##################################################################################
+# definitions: file_operations                                                   #
+# purpose: This standardizes the way files will be handled.                      #
+# note: examples of how to use function(s) are at end of module                  #
+# ################################################################################
+
 import csv
 
 def file_operations(from_script, file_path, mode, data=None, has_header=False):
@@ -81,9 +87,9 @@ def file_operations(from_script, file_path, mode, data=None, has_header=False):
 # file_operations('calling_script', 'resources/NO_header_WITH_write.csv', 'w', output, has_header=True)
 
 # # Read from the CSV file, include header in read - PASS
-data_read_csv_with_header = file_operations('calling_script', 'resources/data_with_header.csv', 'r', has_header=False)
-print("Data read from CSV file with header record:")
-print(data_read_csv_with_header)
+# data_read_csv_with_header = file_operations('calling_script', 'resources/data_with_header.csv', 'r', has_header=False)
+# print("Data read from CSV file with header record:")
+# print(data_read_csv_with_header)
 # # Expected Results: 
 # # Data read from CSV file with header record:
 # # [['Alice', '25'], ['Bob', '30'], ['Charlie', '35']]

@@ -34,10 +34,10 @@ def access_polygon(from_, to, time_span,record_count):
     # OUTPUT
     if time_span == "minute": 
         # this file is over written, daily
-        output = open("resources/HistoricalData/StockPricesTodaysMinutes.csv", "w")
+        output = open("resources/StockData/StockPricesTodaysMinutes.csv", "w")
     else: 
         # this file is over written, daily
-        output = open("resources/HistoricalData/StockPricesTodaysDaily.csv", "w")
+        output = open("resources/StockData/StockPricesTodaysDaily.csv", "w")
         
     record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions\n" # HEADER RECORD
     output.write(record)
