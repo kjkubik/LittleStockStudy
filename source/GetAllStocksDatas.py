@@ -19,8 +19,8 @@ from TableFunctions import stocks_to_tables
 def daily_run():
     print('Starting GetAllStocksData')
     
-    # get stocks daily data
-    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
+    # get DAILY
+    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=5000)).strftime('%Y-%m-%d'),
                   to = datetime.datetime.now().strftime('%Y-%m-%d'), 
                   time_span = "day", 
                   record_count = 1)
@@ -29,11 +29,12 @@ def daily_run():
     # preventing client error 429 
     # TURN BACK ON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!time.sleep(60) 
     
-    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
-                  to = datetime.datetime.now().strftime('%Y-%m-%d'), 
-                  time_span = "minute",
-                  record_count = 1) # used to eliminate "429 Client Error: Too Many Requests for url"
-    print('We have all the minute data.')
+    # get MINUTE - this can only grab 5K records for a single stock, ~ 10 days
+    # access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=10)).strftime('%Y-%m-%d'),
+    #               to = datetime.datetime.now().strftime('%Y-%m-%d'), 
+    #               time_span = "minute",
+    #               record_count = 1) # used to eliminate "429 Client Error: Too Many Requests for url"
+    # print('We have all the minute data.')
     
     print("GetAllStocksData has completed.")
     print("Boooo-yaaaaahhhh!\n")
@@ -42,7 +43,9 @@ def daily_run():
     #     outputMASTER = open("resources/HistoricalData/StockPricesMinuteMaster.csv", "a")    
     #     outputMASTER = open("resources/HistoricalData/StockPricesDailyMaster.csv", "a")
 
-    stocks_to_tables()
+# TODO: We need to write some code that says if we get "AttributeError: 
+# 'StocksEquitiesAggregatesApiResponse' object has no attribute 'results'" then name 
+# the stock and continue through the list...or something like that
 ######################################################################################
 # Showing the main routine you call doesn't need to be named 'main'.                 #
 # This is one way your code can be self documenting. Also, place subroutines in the  #
@@ -69,13 +72,13 @@ def access_polygon(from_, to, time_span,record_count):
         
     record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions\n" # HEADER RECORD
     output.write(record)
-    
+    record_count = 1
     # iterating through input stocks
     for record, row in tickers_df.iterrows():
         ticker =  row['Ticker']
         
         # preventing client error 429 
-        if record_count > 5: 
+        if record_count > 4: 
             print(f"Wait one minute before retrieving next five stocks.")
             time.sleep(60) 
             print (ticker)
