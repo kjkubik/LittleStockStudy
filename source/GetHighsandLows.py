@@ -29,15 +29,14 @@ import psycopg2
 import pandas as pd
 from config import dbconnection        
 
-
-# # Database connection parameters
-# db_params = {
-#     'host': 'your_host',
-#     'database': 'your_database',
-#     'user': 'your_username',
-#     'password': 'your_password'
-# }
 def query_highs_and_lows():
+    # INPUT
+    #tickers_df = pd.read_csv("resources/InputTickers.csv")
+
+    # for record, row in tickers_df.iterrows():
+    #     ticker =  row['Ticker']
+    #    print(ticker)
+    # if record != 'Ticker':
     try:
         # Connect to the database
         conn = psycopg2.connect(dbconnection)
@@ -47,30 +46,100 @@ def query_highs_and_lows():
         cursor = conn.cursor()
 
         # Execute a SELECT query
-        select_query = "SELECT ticker,date,LAG(high) OVER (PARTITION BY ticker ORDER BY date) AS prev_price,high AS next_days_price,CASE WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) < high THEN 'HIGHEST' WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) > high THEN 'LOWEST' ELSE 'UNCH' END AS high_low FROM daily_stock_data;" 
+        select_query = f'''
+                        SELECT ticker, 
+                        date, 
+                        LAG(high) OVER (PARTITION BY ticker ORDER BY date) AS prev_price,
+                        high AS next_days_price,
+                        CASE WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) < high THEN 'HIGHEST' 
+                            WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) > high THEN 'LOWEST' 
+                            ELSE 'UNCH' 
+                        END AS high_low_txt
+                        FROM daily_stock_data
+                        where ticker = 'ADP';
+                        ''' 
+                        #where ticker = '{ticker}';
+        
         high_low_df = pd.read_sql_query(select_query, conn)
-        #print (high_low_df)
-        
-        # Iterate through each row #TODO this is still not right, this needs to be updated right. sometime when get high,' ',high or low,' ',low! 
-        for index, row in high_low_df.iterrows():
-            if index > 0 and row['high_low'] == high_low_df.loc[index - 1, 'high_low']:
-                # Update the high_low value is the same, remove the previous high_low text
-                high_low_df.loc[index, 'high_low'] = ' '
-        
-        # Set display options to show all rows and columns
-        pd.set_option('display.max_rows', None)  # Show all rows
-        
-
         print (high_low_df)
-        # # Fetch the result
-        # rows = cursor.fetchall()
-        # print(rows)
-        # # Process the fetched rows
-        # for row in rows:
-        #     continue
-        #     # Process each row as needed
-        # TODO: ONCE YOU GET the dataframe right, we will put them in the high_low table and then use the high_low table to plot points on graph. 
-        # TODO: put SMA on the same graph too!!! ;)
+
+                
+        # The first row is 'UNCH', so we must find appropriate value:
+        # What is the second row of the dataframe?
+        second_row = high_low_df.loc[1, 'high_low_txt']
+        print(second_row)
+        
+        if second_row == 'HIGHEST':
+            high_low_df.loc[0, 'high_low_txt'] = "LOWEST"
+        else:        
+            high_low_df.loc[0, 'high_low_txt'] = "HIGHEST"
+            
+        #What is the value of the first row now?
+        yesterdays_txt = (high_low_df.loc[0, 'high_low_txt'])    
+
+                
+        # Initialize DataFrame
+        final_df = pd.DataFrame(columns=high_low_df.columns)  
+        final_df = final_df.append(high_low_df.iloc[0])
+        # The first row will always be written to the dataframe.
+        
+        # Starting with the 2nd row, we iterate through all the 
+        # rows to get the lowest lows and the highest highs
+        for i, row in high_low_df.iloc[1:].iterrows():
+            present_txt = high_low_df.iloc[i]['high_low_txt'] 
+            #print(present_txt)               
+            # check if high = high or low = low
+            if present_txt != yesterdays_txt: 
+                
+                final_df.loc[len(final_df)] = row 
+                
+                # assign yesterday's text the text present in this row           
+                yesterdays_txt = present_txt
+        print (final_df)  
+        print (final_df[final_df['high_low_txt'] == 'LOWEST'])          
+        # # First, capture the first record in new dataframe
+        # final_high_low_df = high_low_df.append(high_low_df.iloc[0], ignore_index=True)
+        # print(final_high_low_df)
+        
+        
+                
+        # for i, row in high_low_df.iterrows():
+        #     if i == 
+        # 
+        # print(f"previous: {previous_txt}")
+        
+        # previous_txt = high_low_df.iloc[0]['high_low_txt'] 
+        #         # Iterate through each row #TODO this is still not right, this needs to be updated right. sometime when get high,' ',high or low,' ',low! 
+        #         for i in range(1, len(high_low_df)):
+        #             current_txt = high_low_df.iloc[i]['high_low_txt']
+        #             if previous_txt == current_txt:
+        #                 print(f"No change detected from {previous_txt} to {current_txt} at row {i+1}")
+        #                 # update previous_txt to ' '
+        #                 previous_txt = current_txt
+        #             if previous_txt != current_txt:
+        #                 print(f"Change detected from {previous_txt} to {current_txt} at row {i+1}")
+        #                 previous_txt = current_txt
+                
+            
+                     
+                
+                
+                
+                
+                
+                        # Set display options to show all rows and columns
+        pd.set_option('display.max_rows', None)  # Show all rows
+
+        #print (high_low_df)
+                # # Fetch the result
+                # rows = cursor.fetchall()
+                # print(rows)
+                # # Process the fetched rows
+                # for row in rows:
+                #     continue
+                #     # Process each row as needed
+                # TODO: ONCE YOU GET the dataframe right, we will put them in the high_low table and then use the high_low table to plot points on graph. 
+                # TODO: put SMA on the same graph too!!! ;)
     finally:
         # Close the cursor and connection
         if cursor:

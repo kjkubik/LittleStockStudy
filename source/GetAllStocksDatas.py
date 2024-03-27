@@ -82,7 +82,7 @@ def access_polygon(from_, to, time_span,record_count):
             print(f"Wait one minute before retrieving next five stocks.")
             time.sleep(60) 
             print (ticker)
-            get_stock_price(output, stock_key, ticker, time_span, from_, to)
+            get_stock_price(output, stock_key, ticker, time_span, from_, to)    #some way I got this in the middle of processing: AttributeError: 'StocksEquitiesAggregatesApiResponse' object has no attribute 'results'
             record_count = 1
         else: 
             print (ticker)
