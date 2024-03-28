@@ -25,7 +25,7 @@ def get_SMA():
             stock_prices_df = pd.read_csv(f, usecols=['Date','Close'])
             print(stock_prices_df)   
             
-            # get the SMA for both day_range1 and day_range2
+            # TODO: get the SMA for both day_range1 and day_range2
             
             singleStockdict = stock_prices_df.to_dict()
             print (singleStockdict)
