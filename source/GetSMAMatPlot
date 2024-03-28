@@ -16,8 +16,11 @@ tickers_df = pd.read_csv("resources/InputTickers.csv")
 #print(tickers_df)
 
 # INPUT: we are isolate columns ticker, date, and closing price into a dataframe
-stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
+stock_prices_df = pd.read_csv("resources/HistoricalData/StockPricesTodaysDaily.csv", usecols=['Ticker','Date','Close'])
 #print(stock_prices_df)   
+
+for each
+for each
 
 # OUTPUT
 # Test usage:
