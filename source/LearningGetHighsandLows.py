@@ -54,165 +54,130 @@ from config import dbconnection
 def query_highs_and_lows():
     # TODO: 
     # INPUT
-    #tickers_df = pd.read_csv("resources/InputTickers.csv")
+    tickers_df = pd.read_csv("resources/InputTickersForDev.csv")
 
-    # for record, row in tickers_df.iterrows():
-    #     ticker =  row['Ticker']
-    #    print(ticker)
-    # if record != 'Ticker':
-    try:
-        # Connect to the database
-        conn = psycopg2.connect(dbconnection) 
-        print("Connected to the database!")
+    for record, row in tickers_df.iterrows():
+        ticker =  row['Ticker']
+        print(ticker)
+        if record != 'Ticker':
+    
+            try:
+                # Connect to the database
+                conn = psycopg2.connect(dbconnection) 
+                print("Connected to the database!")
 
-        # Create a cursor object
-        cursor = conn.cursor()
-#TODO: once I add sma to the daily table, I will change this so that the 20 day and the 50 day SMA is used instead of the high
-        # Execute a SELECT query  # <- why?!?!?!?!
-        select_query = f'''    
-                        SELECT ticker, 
-                        date, 
-                        LAG(high) OVER (PARTITION BY ticker ORDER BY date) AS prev_price,
-                        high AS next_days_price,
-                        CASE WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) < high THEN 'HIGHEST' 
-                            WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) > high THEN 'LOWEST' 
-                            ELSE 'UNCH' 
-                        END AS high_low_txt
-                        FROM daily_stock_data
-                        where ticker = 'ADP'
-                        and date between '2023-04-01' and '2023-04-30';
-                        ''' 
-                        #where ticker = '{ticker}';
-        # TODO: the right code (in GetHighs and Lows)
-        
-        high_low_df = pd.read_sql_query(select_query, conn)
-        print (high_low_df)
-        
-        select_query2 = f'''    
-                        SELECT ticker, 
-                        date, 
-                        high AS next_days_price,
-                        FROM daily_stock_data
-                        where ticker = 'ADP'
-                        and date between '2023-04-01' and '2024-04-31';
-                        ''' 
-                        #where ticker = '{ticker}';
-        # TODO: the right code (in GetHighs and Lows)
-        
-        high_df = pd.read_sql_query(select_query, conn)
-        print (high_df)
-        
-        # The first row is 'UNCH', so we must find appropriate value:
-        # What is the second row of the dataframe?
-        second_row = high_low_df.loc[1, 'high_low_txt']
-        print('GetHighandLows:second_row: ' + second_row)
-        
-        if second_row == 'HIGHEST':
-            high_low_df.loc[0, 'high_low_txt'] = "LOWEST"
-        else:        
-            high_low_df.loc[0, 'high_low_txt'] = "HIGHEST"
+                # Create a cursor object
+                cursor = conn.cursor()
+        #TODO: once I add sma to the daily table, I will change this so that the 20 day and the 50 day SMA is used instead of the high
+                # Execute a SELECT query  # <- why?!?!?!?!
+                select_query = f'''    
+                                SELECT ticker, 
+                                date, 
+                                LAG(high) OVER (PARTITION BY ticker ORDER BY date) AS prev_price,
+                                high AS next_days_price,
+                                CASE WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) < high THEN 'HIGHEST' 
+                                    WHEN LAG(high) OVER (PARTITION BY ticker ORDER BY date) > high THEN 'LOWEST' 
+                                    ELSE 'UNCH' 
+                                END AS high_low_txt
+                                FROM daily_stock_data
+                                where ticker = '{ticker}'
+                                and date between '2022-03-31' and '2024-03-31'
+                                ''' 
+                                #where ticker = '{ticker}';
+                # TODO: the right code (in GetHighs and Lows)
+                
+                high_low_df = pd.read_sql_query(select_query, conn)
+                print (high_low_df)
+                
+            finally:
+                # Close the cursor and connection
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()                    
+                
+            # The first row is 'UNCH', so we must find appropriate value:
+            # What is the second row of the dataframe?
+            second_row = high_low_df.loc[1, 'high_low_txt']
+            print('GetHighandLows:second_row: ' + second_row)
             
-        #What is the value of the first row now?
-        yesterdays_txt = (high_low_df.loc[0, 'high_low_txt'])    
+            if second_row == 'HIGHEST':
+                high_low_df.loc[0, 'high_low_txt'] = "LOWEST"
+            else:        
+                high_low_df.loc[0, 'high_low_txt'] = "HIGHEST"
                 
-        # Initialize DataFrame and write the first row to the dataframe. 
+            #What is the value of the first row now?
+            yesterdays_txt = (high_low_df.loc[0, 'high_low_txt'])    
         
-        # Why doens't this work?
-        # final_df = [] # Initialize an empty DataFrame
-        # final_df = final_df.append(high_low_df.iloc[0])
+            final_df = pd.DataFrame()  # Initialize an empty DataFrame
+            final_df = final_df.append(high_low_df.iloc[-1])  # Append the last row (reversed order)
+            print(final_df)
+            yesterdays_txt = high_low_df.iloc[-1]['high_low_txt']  # Initialize yesterdays_txt with the last row's text
+
+            # Iterate through the rows of high_low_df in reverse order
+            for i, row in high_low_df.iloc[::-1].iterrows():
+                present_txt = row['high_low_txt']
+                if present_txt != yesterdays_txt:
+                    final_df = final_df.append(row)  # Append rows to the DataFrame
+                    yesterdays_txt = present_txt
+
+            print(final_df)
+            
+            # Initialize variables
+            low_count = 0  # Initialize variable to count 'LOWEST' occurrences
+            prev_low_date = None  # Initialize variable to store the date of the previous 'LOWEST'
+
+            # Iterate through the rows of final_df
+            for index, row in final_df.iterrows():
+                if row['high_low_txt'] == 'LOWEST':
+                    low_count += 1  # Increment the count of 'LOWEST'
+                    if low_count > 1:  # Check if this is not the first 'LOWEST'
+                        low_distance = abs((row['date'] - prev_low_date).days)  # Calculate the absolute difference in days
+                        print(f"{prev_low_date.strftime('%Y-%m-%d')} - {row['date'].strftime('%Y-%m-%d')}: {low_distance}")
+                    prev_low_date = row['date']  # Update the previous 'LOWEST' date
+            
+            # Set display options to show all rows and columns
+            # pd.set_option('display.max_rows', None)  # Show all rows
+            print (final_df)  
+            print ((final_df['high_low_txt'] == 'LOWEST').sum())          
+            print ((final_df['high_low_txt'] == 'HIGHEST').sum()) 
+            plot_highs_and_lows(ticker,final_df)    
+        # TODO: ONCE YOU GET the dataframe right, we will put them in the high_low table and then use the high_low table to plot points on graph. 
+        # TODO: put SMA on the same graph too!!! ;)
         
-        # Why doesn't this work?
-        # final_df = pd.DataFrame()  # Initialize an empty DataFrame
-        # final_df.append(high_low_df.iloc[0])
-        
-        # Solution #1 - This does work
-        # final_df = pd.DataFrame(columns=high_low_df.columns)  
-        # #final_df.append(high_low_df.iloc[0]) <- Why doesn't this work?
-        # final_df = final_df.append(high_low_df.iloc[0])
-        # #print('Rows in final_df: ' + final_df) #<- Why doesn't this work?
-        # print('Rows in final_df: ' + str(len(final_df)))
-        # print(final_df) # What does this give you?
-        
-        # # Starting with the 2nd row, we iterate through all the 
-        # # rows to get the lowest lows and the highest highs
-        # for i, row in high_low_df.iloc[1:].iterrows():
-        #     present_txt = high_low_df.iloc[i]['high_low_txt'] 
-        #     if present_txt != yesterdays_txt: 
-        #         final_df.loc[len(final_df)] = row # <- This does the same thing as final_df = final_df.append(row). Which should I use?
-        #         # final_df = final_df.loc[len(final_df)] = row
-        #         yesterdays_txt = present_txt                 
-
-        # Solution #2 - This does work
-        # final_df = pd.DataFrame()  # Initialize an empty DataFrame
-        # final_df = final_df.append(high_low_df.iloc[0])  # Append the first row
-        # print(final_df)
-        # # Starting with the 2nd row, iterate through all  
-        # # rows to get lowest lows and the highest highs
-        # for i, row in high_low_df.iloc[1:].iterrows():
-        #     present_txt = high_low_df.iloc[i]['high_low_txt']
-        #     if present_txt != yesterdays_txt: 
-        #         final_df = final_df.append(row)  # Append rows to the DataFrame
-        #         yesterdays_txt = present_txt
-                
-        #high_low_df = pd.DataFrame(data)
-
-        final_df = pd.DataFrame()  # Initialize an empty DataFrame
-        final_df = final_df.append(high_low_df.iloc[-1])  # Append the last row (reversed order)
-        print(final_df)
-        yesterdays_txt = high_low_df.iloc[-1]['high_low_txt']  # Initialize yesterdays_txt with the last row's text
-
-        # Iterate through the rows of high_low_df in reverse order
-        for i, row in high_low_df.iloc[::-1].iterrows():
-            present_txt = row['high_low_txt']
-            if present_txt != yesterdays_txt:
-                final_df = final_df.append(row)  # Append rows to the DataFrame
-                yesterdays_txt = present_txt
-
-        print(final_df)        
         # Test: Is the data frames total count equal to the sum of the 'LOWEST' count and 'HIGHEST' count
         # TODO: Do something if they are not equal
 
-        # Set display options to show all rows and columns
-        # pd.set_option('display.max_rows', None)  # Show all rows
-        print (final_df)  
-        print ((final_df['high_low_txt'] == 'LOWEST').sum())          
-        print ((final_df['high_low_txt'] == 'HIGHEST').sum()) 
-          
-        # PLOTTING     
-        # Create a new DataFrame with 'date' and 'next_days_price' columns
-        hl_df = final_df[['date', 'next_days_price']]
-        print(hl_df)
+def plot_highs_and_lows(ticker,final_df):         
         
-        plot_high_df = high_df[['date', 'next_days_price']]
-        print(plot_high_df)
-        
-        # Create traces for hl_df and high_df
-        #trace_hl = go.Scatter(x=hl_df['date'], y=hl_df['next_days_price'], mode='markers', name='High/Low')
-        trace_high = go.Scatter(x=plot_high_df['date'], y=plot_high_df['next_days_price'], mode='lines', name='All days')
-        #trace_points = go.Scatter(x=hl_df['date'], y=hl_df['next_days_price'], mode='lines', name='High/Low')
+    # PLOTTING     
+    # Create a new DataFrame with 'date' and 'next_days_price' columns
+    hl_df = final_df[['date', 'next_days_price']]
+    print(hl_df)
+    
+    # plot_high_df = high_df[['date', 'next_days_price']]
+    # print(plot_high_df)
+    
+    # Create traces for hl_df and high_df
+    trace_hl = go.Scatter(x=hl_df['date'], y=hl_df['next_days_price'], mode='markers', name='High/Low')
+    #trace_high = go.Scatter(x=plot_high_df['date'], y=plot_high_df['next_days_price'], mode='lines', name='All days')
+    trace_points = go.Scatter(x=hl_df['date'], y=hl_df['next_days_price'], mode='lines', name='High/Low')
 
-        # Create a figure and add traces
-        fig = go.Figure()
-        #fig.add_trace(trace_hl)
-        fig.add_trace(trace_high)
-        #fig.add_trace(trace_points)
+    # Create a figure and add traces
+    fig = go.Figure()
+    fig.add_trace(trace_hl)
+    #fig.add_trace(trace_high)
+    fig.add_trace(trace_points)
 
-        # Update figure layout (optional)
-        fig.update_layout(title='High/Low and Prices', xaxis_title='Date', yaxis_title='Value')
+    # Update figure layout (optional)
+    fig.update_layout(title='High/Low and Prices' + ticker, xaxis_title='Date', yaxis_title='Value')
 
-        # Show the figure
-        fig.show() 
+    # Show the figure
+    fig.show() 
 
 
 
-# TODO: ONCE YOU GET the dataframe right, we will put them in the high_low table and then use the high_low table to plot points on graph. 
-# TODO: put SMA on the same graph too!!! ;)
-    finally:
-        # Close the cursor and connection
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+
 # MAIN
 if __name__ == '__main__':
     

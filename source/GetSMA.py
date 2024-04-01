@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 
 
 def get_SMA():
-    ticker = 'PLTR'
+    ticker = 'SMRT'
     start_date = '2022-03-31'
     end_date = '2024-03-31'
     # INPUT tickers
@@ -30,7 +30,7 @@ def get_SMA():
     # Convert 'date' column to datetime format
     single_stock_df['Date'] = pd.to_datetime(single_stock_df['Date'])
 
-    
+    # TODO: When getting all stocks you want to grab 
 
     # Calculate SMA for a specified window size (e.g., 3 days)
     window_size1 = 10
