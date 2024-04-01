@@ -20,11 +20,13 @@ def daily_run():
     print('Starting GetAllStocksData')
     
     # get DAILY
-    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=5000)).strftime('%Y-%m-%d'),
+    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=1000)).strftime('%Y-%m-%d'),
                   to = datetime.datetime.now().strftime('%Y-%m-%d'), 
-                  time_span = "day", 
-                  record_count = 1)
+                  time_span = "day")
     print('We have all Daily data.')
+    
+    # backing up all output file
+    backup_output_file()
     
     # preventing client error 429 
     # TURN BACK ON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!time.sleep(60) 
@@ -51,7 +53,7 @@ def daily_run():
 # This is one way your code can be self documenting. Also, place subroutines in the  #
 # order they are called.                                                             #
 ######################################################################################
-def access_polygon(from_, to, time_span,record_count):
+def access_polygon(from_, to, time_span):
     
     # TEST: Are all parameters into AccessPolygon correct?
     # print("AccessPolygon")
@@ -117,14 +119,31 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
                 record = f"{ticker},{dt},{result['o']},{result['h']},{result['l']},{result['c']},{result['v']}," \
                      f"{result['vw']},{result['n']}\n"
                 output.write(record)
-            else: 
+            else: # time_span == daily
                 dt = ts_to_datetime(result["t"])
                 record = f"{ticker},{dt},{result['o']},{result['h']},{result['l']},{result['c']},{result['v']}," \
                      f"{result['vw']},{result['n']}\n"
                 output.write(record)
                 
-            
+def backup_output_file():
+    # Load the CSV files into DataFrames
+    file1 = 'resources/HistoricalData/StockPricesTodaysDaily.csv'
+    file2 = 'resources/HistoricalData/StockPricesTodaysDailyAllDays.csv'
 
+    df1 = pd.read_csv(file1)
+    df2 = pd.read_csv(file2)
+
+    # Append df1 to df2
+    df_combined = df2.append(df1, ignore_index=True)
+    
+    # Remove duplicates
+    df_combined = df_combined.drop_duplicates()
+
+    # Save the combined DataFrame to a new CSV file
+    output_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+    df_combined.to_csv(output_file, index=False)
+
+    print("Data appended and saved successfully to:", output_file)                
 ######################################################################################
 # date format YYYY-MM-DD                               .                                #
 ######################################################################################
@@ -136,5 +155,5 @@ def ts_to_datetime(ts) -> str:
 ######################################################################################
 if __name__ == '__main__':
     
-    daily_run()
-    
+    daily_run() # THIS TAKES 17 HOURS TO GRAB ALL STOCKS. NO BUY DATA!
+    stocks_to_tables() #TODO: ONLY RUN WHEN GETTING ALL STOCKS!!!! NO BUY DATA!
