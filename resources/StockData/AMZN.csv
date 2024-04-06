@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 AMZN,2024-03-21 03:00:00,179.26,179.3,179,179.15,3071,179.1134,68
 AMZN,2024-03-21 03:01:00,179,179.2,178.91,179.2,3396,179.0416,69
 AMZN,2024-03-21 03:02:00,179.23,179.23,179.23,179.23,1148,179.2468,18

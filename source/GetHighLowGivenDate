@@ -1,0 +1,149 @@
+# To keep this relatively simple, we will insert records first. 
+# This is the first query to get data into the high_low table: 
+import psycopg2
+import pandas as pd
+import plotly.graph_objects as go
+import pandas as pd
+import csv
+
+def house_keeping():
+    # INPUT
+    input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+    # OUTPUT
+    output_file = 'resources/HistoricalData/HighestHighsLowestLows.csv'
+    
+    # Input Ticker
+    ticker = 'PLTR'
+    # Input date range
+    begin_date = pd.to_datetime('2022-04-01') 
+    end_date = pd.to_datetime('2024-04-30')
+    
+    # Used to iterate by month
+    current_date = begin_date
+    # Calculate the last day of the current month
+    last_day_of_month = current_date + pd.offsets.MonthEnd(0)
+    
+    # Read the file into a DataFrame
+    df = pd.read_csv(input_file)
+
+    # date to datetime format
+    df['date'] = pd.to_datetime(df['date'])
+
+    with open(output_file, mode='a', newline='') as file:
+        # Create a CSV writer object
+        writer = csv.writer(file)
+    
+        # Write the header row
+        writer.writerow(['ticker', 'date', 'close', 'high_low', 'percent_change'])
+        
+        # Iterate through each month
+        while current_date <= last_day_of_month and last_day_of_month <= end_date:
+                
+            # Print or perform operations for the current month
+            print("First day of month:", current_date.strftime('%Y-%m-%d'))
+            print("Last day of month:", last_day_of_month.strftime('%Y-%m-%d'))
+            
+            # Transform Data:
+            # Filter records based on date range and ticker value
+            analysis_record_df = df[(df['date'] >= current_date) & (df['date'] <= last_day_of_month) & 
+                                (df['ticker'] == ticker)]
+            # print(analysis_record_df)
+            
+            analysis_record_df = analysis_record_df[['ticker', 'date', 'close']]
+            # print(analysis_record_df)
+            
+            # Add 'high_low' column and initialize with NaN using .loc
+            analysis_record_df.loc[:, 'high_low'] = pd.NA
+            # print(analysis_record_df)
+            
+            # Iterate over rows and assign 'low' and 'high' values in 'high_low'
+            # Iterate over rows and assign 'high_low' values
+            for index, row in analysis_record_df.iterrows():
+                if index > 0 and index - 1 in analysis_record_df.index and row['close'] > analysis_record_df.loc[index - 1, 'close']:
+                    analysis_record_df.loc[index, 'high_low'] = 'high'
+                else:
+                    analysis_record_df.loc[index, 'high_low'] = 'low'
+            
+            # print(analysis_record_df)
+            
+            # Reset the index of the DataFrame
+            analysis_record_df.reset_index(drop=True, inplace=True)
+            
+            #----
+            # Give me all the highest highs and lowest lows, eliminating consecutive
+            # values in high_low that are the same. 
+            
+            # Initialize a new DataFrame to store filtered rows
+            highs_lows_df = pd.DataFrame(columns=analysis_record_df.columns)
+
+            # Iterate through the DataFrame starting from index 0
+            for i in range(len(analysis_record_df) - 1):
+                # print(analysis_record_df.loc[i,'high_low'] + '-' + analysis_record_df.loc[i+1, 'high_low'])
+                
+                # append if row i is not same as row i+1
+                if analysis_record_df.loc[i, 'high_low'] != analysis_record_df.loc[i + 1, 'high_low']:
+                    highs_lows_df = highs_lows_df.append(analysis_record_df.loc[i])
+            
+            # Reset the index of the DataFrame - using below!!!
+            highs_lows_df.reset_index(drop=True, inplace=True)
+            
+            # Set display options to show all rows and columns
+            pd.set_option('display.max_rows', None)  # Show all rows
+            # Print the final DataFrame
+            #print(highs_lows_df)     
+            
+            # ---
+            # NEXT, find the highest high and lowest low
+            
+            highest_high = float('-inf')
+            lowest_low = float('inf')
+            
+            # Iterate through rows to find highest 'high' and lowest 'low'
+            for index, row in highs_lows_df.iterrows():
+                if row['high_low'] == 'high' and row['close'] > highest_high:
+                    highest_high = row['close']
+                elif row['high_low'] == 'low' and row['close'] < lowest_low:
+                    lowest_low = row['close']
+
+            # print("Highest High:", highest_high)
+            # print("Lowest Low:", lowest_low)
+            
+            # Initialize an empty DataFrame to store the filtered rows
+            highest_lowest_df = pd.DataFrame(columns=highs_lows_df.columns)
+            
+            # Add a row for 'percent_change' to highest_lowest_df
+            highest_lowest_df.loc['percent_change'] = None
+            
+            # Initialize a list to store percent change values for each record
+            percent_changes = []
+            
+            # Append rows to final_df if they have the highest 'high' or lowest 'low' values
+            for index, row in highs_lows_df.iterrows():
+                if row['close'] == highest_high or row['close'] == lowest_low:
+                    percent_change = ((row['close'] - lowest_low) / lowest_low) * 100
+                    percent_changes.append(percent_change)
+                    
+                    highest_lowest_df = highest_lowest_df.append(row)
+                    
+                    writer.writerow([row['ticker'], row['date'], row['close'], row['high_low'], percent_change])
+
+            # Add the calculated percent changes to the 'percent_change' row in highest_lowest_df
+            # highest_lowest_df.loc['percent_change', 'close'] = percent_changes
+            
+            # Reset the index of the final DataFrame
+            highest_lowest_df.reset_index(drop=True, inplace=True)
+
+            # Print the final DataFrame
+            print(highest_lowest_df)
+            
+            # your in a while loop and you want to do the same thing with the next month
+            current_date = last_day_of_month + pd.offsets.Day(1)
+            last_day_of_month = current_date + pd.offsets.MonthEnd(0)
+        
+         
+    
+# MAIN
+if __name__ == '__main__':
+    
+    house_keeping()
+    print ('GetHighsandLows Processing Complete')

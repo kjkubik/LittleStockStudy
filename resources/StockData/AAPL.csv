@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 AAPL,2024-03-21 03:00:00,177.03,177.03,176.11,176.19,7914,176.3463,316
 AAPL,2024-03-21 03:01:00,176.2,176.38,176.2,176.33,2652,176.2539,112
 AAPL,2024-03-21 03:02:00,176.42,176.5,176.42,176.5,2556,176.4862,75

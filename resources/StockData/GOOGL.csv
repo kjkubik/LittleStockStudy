@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 GOOGL,2024-03-21 03:00:00,149.81,149.84,149.69,149.7,1148,149.7346,68
 GOOGL,2024-03-21 03:01:00,149.66,149.66,149.65,149.65,1065,149.6515,7
 GOOGL,2024-03-21 03:04:00,149.65,149.66,149.65,149.65,1365,149.6574,36

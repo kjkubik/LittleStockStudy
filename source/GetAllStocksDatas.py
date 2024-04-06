@@ -15,18 +15,21 @@ import datetime
 import time
 from config import stock_key
 from TableFunctions import stocks_to_tables
+from Backup_Files import backup_input_tickers
+from Backup_Files import backup_daily
 
 def daily_run():
     print('Starting GetAllStocksData')
     
-    # get DAILY
-    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=1000)).strftime('%Y-%m-%d'),
+    # get DAILY                                                 
+    access_polygon(from_ = (datetime.datetime.now() - datetime.timedelta(days=600)).strftime('%Y-%m-%d'),
                   to = datetime.datetime.now().strftime('%Y-%m-%d'), 
                   time_span = "day")
+    
     print('We have all Daily data.')
     
     # backing up all output file
-    backup_output_file()
+    
     
     # preventing client error 429 
     # TURN BACK ON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!time.sleep(60) 
@@ -72,12 +75,12 @@ def access_polygon(from_, to, time_span):
         # this file is over written, daily
         output = open("resources/HistoricalData/StockPricesTodaysDaily.csv", "w")
         
-    record = f"Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions\n" # HEADER RECORD
+    record = f"ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions\n" # HEADER RECORD
     output.write(record)
     record_count = 1
     # iterating through input stocks
     for record, row in tickers_df.iterrows():
-        ticker =  row['Ticker']
+        ticker =  row['ticker']
         
         # preventing client error 429 
         if record_count > 4: 
@@ -125,25 +128,26 @@ def get_stock_price(output, client_key, ticker, time_span, from_, to):
                      f"{result['vw']},{result['n']}\n"
                 output.write(record)
                 
-def backup_output_file():
-    # Load the CSV files into DataFrames
-    file1 = 'resources/HistoricalData/StockPricesTodaysDaily.csv'
-    file2 = 'resources/HistoricalData/StockPricesTodaysDailyAllDays.csv'
+# def backup_output_file():
+#     input_file = 'resources/HistoricalData/StockPricesTodaysDaily.csv'
+#     output_file = 'resources/HistoricalData/StockPricesTodaysDailyAllDays.csv'
 
-    df1 = pd.read_csv(file1)
-    df2 = pd.read_csv(file2)
+#     # Chunk size for reading the input file
+#     chunk_size = 1000
 
-    # Append df1 to df2
-    df_combined = df2.append(df1, ignore_index=True)
-    
-    # Remove duplicates
-    df_combined = df_combined.drop_duplicates()
+#     # Create an empty DataFrame to store deduplicated data
+#     df_deduplicated = pd.DataFrame()
 
-    # Save the combined DataFrame to a new CSV file
-    output_file = 'resources/HistoricalData/CombinedStockPrices.csv'
-    df_combined.to_csv(output_file, index=False)
+#     # Iterate over chunks of the input file
+#     for chunk in pd.read_csv(input_file, chunksize=chunk_size):
+#         # Deduplicate the chunk and append to the deduplicated DataFrame
+#         df_deduplicated = df_deduplicated.append(chunk.drop_duplicates())
 
-    print("Data appended and saved successfully to:", output_file)                
+#     # Write the deduplicated data to the output file
+#     df_deduplicated.to_csv(output_file, index=False)
+
+#     print("Deduplicated data saved successfully to:", output_file)
+            
 ######################################################################################
 # date format YYYY-MM-DD                               .                                #
 ######################################################################################
@@ -155,5 +159,8 @@ def ts_to_datetime(ts) -> str:
 ######################################################################################
 if __name__ == '__main__':
     
-    daily_run() # THIS TAKES 17 HOURS TO GRAB ALL STOCKS. NO BUY DATA!
-    stocks_to_tables() #TODO: ONLY RUN WHEN GETTING ALL STOCKS!!!! NO BUY DATA!
+    daily_run() 
+    
+    backup_input_tickers()
+    backup_daily()
+    # stocks_to_tables() 

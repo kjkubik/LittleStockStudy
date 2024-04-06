@@ -1,0 +1,121 @@
+import psycopg2
+import pandas as pd
+import plotly.graph_objects as go
+import pandas as pd
+import csv
+
+def house_keeping():
+    # INPUT
+    input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+    # OUTPUT
+    output_file = 'resources/HistoricalData/HighsandLowsforAllTickers.csv'
+
+    # Input Ticker
+    ticker = 'PLTR'
+    # Input date range
+    begin_date = pd.to_datetime('2023-10-20') 
+    end_date = pd.to_datetime('2024-04-06')
+        
+    # Read the input_file into a DataFrame
+    df = pd.read_csv(input_file)
+
+    # date to datetime format
+    df['date'] = pd.to_datetime(df['date'])
+    
+    analysis_record_df = df[(df['date'] >= begin_date) & (df['date'] <= end_date) & 
+                                (df['ticker'] == ticker)]
+    # print(analysis_record_df)
+            
+    analysis_record_df = analysis_record_df[['ticker', 'date', 'close']]
+    #print(analysis_record_df)
+    
+    # Reset the index of the DataFrame
+    analysis_record_df.reset_index(drop=True, inplace=True)
+    
+    # # Find the row with the lowest close amount
+    # lowest_close_row = analysis_record_df.loc[analysis_record_df['close'].idxmin()]
+    # print(lowest_close_row)
+
+    # # Find the row with the highest close amount
+    # highest_close_row = analysis_record_df.loc[analysis_record_df['close'].idxmax()]
+    # print(highest_close_row)
+    
+    # Find the row with the lowest close amount
+    lowest_close_row = analysis_record_df[analysis_record_df['close'] == analysis_record_df['close'].min()]
+    print(lowest_close_row)
+    
+    # Find the row with the highest close amount
+    highest_close_row = analysis_record_df[analysis_record_df['close'] == analysis_record_df['close'].max()]
+    print(highest_close_row)
+
+    # Create a new DataFrame with the lowest and highest close rows
+    highest_lowest_df = pd.concat([lowest_close_row, highest_close_row]).reset_index(drop=True)
+    print(highest_lowest_df)
+    
+    # Calculate the difference between the highest and lowest close amounts
+    difference = highest_lowest_df.loc[1, 'close'] - highest_lowest_df.loc[0, 'close']
+
+    # Display the difference
+    print("The difference between the highest and lowest close amounts is:", difference)
+    
+    
+    # # Create a new DataFrame with the lowest and highest close rows
+    # highest_lowest_df = pd.concat([lowest_close_row, highest_close_row], axis=1).T
+    # print(highest_lowest_df)
+    
+    #  # Reset the index of the DataFrame
+    # highest_lowest_df.reset_index(drop=True, inplace=True)
+    # print(highest_lowest_df)
+    
+    # # Calculate the difference between the highest and lowest close amounts
+    # difference = highest_lowest_df.loc[highest_lowest_df.index == 'highest', 'close'].values[0] - \
+    #              highest_lowest_df.loc[highest_lowest_df.index == 'lowest', 'close'].values[0]
+
+    # # Display the difference
+    # print("The difference between the highest and lowest close amounts is:", difference)
+    
+    
+    
+    
+
+#     with open(output_file, mode='a', newline='') as file:
+#         # Create a CSV writer object
+#         writer = csv.writer(file)
+    
+#         # Write the header row
+#         writer.writerow(['ticker', 'date', 'close', 'percent_change'])
+
+
+# # Filter the DataFrame based on the date range
+# filtered_data = stock_data[(stock_data['date'] >= begin_date) & (stock_data['date'] <= end_date)]
+
+# # Initialize empty lists to store the results
+# results = []
+
+# # Iterate through each ticker
+# for ticker in filtered_data['ticker'].unique():
+#     ticker_data = filtered_data[filtered_data['ticker'] == ticker]
+    
+#     # Find the lowest and highest closing prices
+#     lowest_price = ticker_data['close'].min()
+#     highest_price = ticker_data['close'].max()
+    
+#     # Find the corresponding date for the lowest and highest prices
+#     lowest_date = ticker_data.loc[ticker_data['close'] == lowest_price, 'date'].iloc[0]
+#     highest_date = ticker_data.loc[ticker_data['close'] == highest_price, 'date'].iloc[0]
+    
+#     # Append the results to the list
+#     results.append({'ticker': ticker, 'lowest_date': lowest_date, 'lowest_price': lowest_price,
+#                     'highest_date': highest_date, 'highest_price': highest_price})
+
+# # Convert the results list to a DataFrame
+# output_df = pd.DataFrame(results)
+
+# # Print the output DataFrame
+# print(output_df)
+
+# MAIN
+if __name__ == '__main__':
+    
+    house_keeping()
+    print ('GetHighsandLows Processing Complete')

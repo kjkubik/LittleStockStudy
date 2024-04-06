@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 OXY,2024-03-15 03:00:00,62.5,62.5,62.5,62.5,311,62.5407,14
 OXY,2024-03-15 04:12:00,62.62,62.62,62.62,62.62,272,62.62,19
 OXY,2024-03-15 04:22:00,62.51,62.51,62.51,62.51,111,62.51,1

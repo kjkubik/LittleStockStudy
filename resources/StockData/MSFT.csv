@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 MSFT,2024-03-21 03:02:00,428.99,428.99,428.99,428.99,1944,428.8497,89
 MSFT,2024-03-21 03:03:00,428.6,428.6,428.6,428.6,437,428.7267,14
 MSFT,2024-03-21 03:04:00,428.6,428.6,428.6,428.6,1498,428.704,52
