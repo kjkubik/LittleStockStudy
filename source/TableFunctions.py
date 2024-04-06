@@ -3,16 +3,17 @@ import psycopg2
 import datetime
 from config import dbconnection
 
-def stocks_to_tables():
+def stocks_to_tables(input_file):
     print('Starting DatatoTables')
     
     # move_csv_to_daily_stock_data(file_date = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
     #                              time_frame = "Minutes")
 
-    move_csv_to_daily_stock_data(file_date = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
-                                time_frame = "Daily")
+    move_csv_to_daily_stock_data(input_file,
+                                 file_date = (datetime.datetime.now() - datetime.timedelta(days=729)).strftime('%Y-%m-%d'),
+                                 time_frame = "Daily")
     
-def move_csv_to_daily_stock_data(file_date, time_frame):
+def move_csv_to_daily_stock_data(input_file, file_date, time_frame):
     
     print(file_date)
     print(time_frame)
@@ -28,10 +29,6 @@ def move_csv_to_daily_stock_data(file_date, time_frame):
         # Open the CSV file for reading
         # INPUT file
 #       input_file = "resources/HistoricalData/StockPricesTodaysDaily" + time_frame + ".csv"
-        input_file = "resources/HistoricalData/SendToDatabase.csv"
-        #input_file = "resources/HistoricalData/StockPricesTodaysDaily.csv"
-        print(input_file)
-        
         
         with open(input_file, 'r') as csvfile:
             csvreader = csv.reader(csvfile)
@@ -90,5 +87,6 @@ def move_csv_to_daily_stock_data(file_date, time_frame):
 # MAIN
 if __name__ == '__main__':
     
+    # stocks_to_tables(input_file = "resources/HistoricalData/SendToDatabase.csv")
     stocks_to_tables()
     print ('All data in tables. Processing Complete')
