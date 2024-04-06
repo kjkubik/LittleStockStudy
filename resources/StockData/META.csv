@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 META,2024-03-21 03:00:00,509.8,510,509.8,510,507,509.7829,40
 META,2024-03-21 03:04:00,511.83,511.88,511.83,511.88,682,511.8004,18
 META,2024-03-21 03:05:00,511.23,511.23,511.23,511.23,396,511.2441,13

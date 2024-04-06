@@ -16,9 +16,9 @@ secondEMADays = 5
 tickers_df = pd.read_csv("resources/InputTickers.csv")
 print(tickers_df)
 # isolate ticker, date, and closing prices in dataframe
-stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['Ticker','Date','Close'])
+stock_prices_df = pd.read_csv("C:/Users/kkubi/LittleStockStudy/resources/StockPrices.csv", usecols=['ticker','date','close'])
 print(stock_prices_df)   
-ticker_close_prices_df = stock_prices_df.groupby(["Ticker"]).mean()["Close"]
+ticker_close_prices_df = stock_prices_df.groupby(["ticker"]).mean()["close"]
 print (ticker_close_prices_df)
 
 # # OUTPUT
@@ -39,20 +39,20 @@ print (ticker_close_prices_df)
 #     # iterating through input stocks
 #     for record, row in tickers_df.iterrows():
         
-#         present_ticker = row['Ticker']
+#         present_ticker = row['ticker']
 #         #print (present_ticker)
 #         #print('first forloop:', present_ticker)
         
 #         sma_flag = True
         
 #         # count the number of occurances having the present ticker
-#         #count_present_tickers_rows = stock_prices_df['Ticker'].value_counts()[present_ticker]
+#         #count_present_tickers_rows = stock_prices_df['ticker'].value_counts()[present_ticker]
 #         #print(count_present_tickers_rows)
         
 #         #print(stock_prices_df)
         
 #         # # based on present ticker, create df
-#         # present_ticker_df = stock_prices_df.loc[stock_prices_df['Ticker']] == present_ticker
+#         # present_ticker_df = stock_prices_df.loc[stock_prices_df['ticker']] == present_ticker
 #         # print (present_ticker_df)
             
 #         for record, row in stock_prices_df.iterrows():
@@ -84,10 +84,10 @@ print (ticker_close_prices_df)
 
     
     
-#     # ticker_held =  row['Ticker']
+#     # ticker_held =  row['ticker']
 #     # print(ticker_held)
     
-#     # if stock_df['Ticker'].value_counts()[ticker_held]
+#     # if stock_df['ticker'].value_counts()[ticker_held]
     
         
         
@@ -100,7 +100,7 @@ print (ticker_close_prices_df)
     
 
 # # # create a df for first stock ticker
-# # ticker_df = df[df["Ticker"].str.contains(ticker)]
+# # ticker_df = df[df["ticker"].str.contains(ticker)]
 # # print(ticker_df)
 
 # # # how many rows are there?

@@ -27,7 +27,9 @@ def move_csv_to_daily_stock_data(file_date, time_frame):
 
         # Open the CSV file for reading
         # INPUT file
-        input_file = "resources/HistoricalData/StockPricesTodays" + time_frame + ".csv"
+#       input_file = "resources/HistoricalData/StockPricesTodaysDaily" + time_frame + ".csv"
+        input_file = "resources/HistoricalData/SendToDatabase.csv"
+        #input_file = "resources/HistoricalData/StockPricesTodaysDaily.csv"
         print(input_file)
         
         

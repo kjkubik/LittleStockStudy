@@ -1,4 +1,4 @@
-Ticker,Date,Open,High,Low,Close,Volume,VolumeWeight,NumberOfTransactions
+ticker,date,open,high,low,close,volume,volume_weight,number_of_transactions
 NVDA,2024-03-21 03:00:00,916.09,916.09,914.49,915,6064,914.9532,325
 NVDA,2024-03-21 03:01:00,915.77,916.85,915.77,915.84,5564,916.3045,246
 NVDA,2024-03-21 03:02:00,915.6,915.6,914.8,914.8,2459,915.0518,162

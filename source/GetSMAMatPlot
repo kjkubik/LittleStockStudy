@@ -19,8 +19,8 @@ tickers_df = pd.read_csv("resources/InputTickers.csv")
 stock_prices_df = pd.read_csv("resources/HistoricalData/StockPricesTodaysDaily.csv", usecols=['Ticker','Date','Close'])
 #print(stock_prices_df)   
 
-for each
-for each
+#for each
+
 
 # OUTPUT
 # Test usage:
@@ -61,21 +61,21 @@ def get_SMA():
     # iterating through input stocks to get SMA
     for record, row in tickers_df.iterrows():
         # what 
-        present_ticker = row['Ticker']
+        present_ticker = row['ticker']
         print ('present ticker:' + present_ticker)
         
         # move only present ticker into a dataframe
-        present_ticker_df = stock_prices_df[stock_prices_df['Ticker'] == present_ticker]
+        present_ticker_df = stock_prices_df[stock_prices_df['ticker'] == present_ticker]
         print(present_ticker_df)
 
 
         # X-AXIS: move present ticker's closing prices to a list
-        date_list1 = present_ticker_df[present_ticker_df['Ticker'] == present_ticker]['Date'].tolist()
+        date_list1 = present_ticker_df[present_ticker_df['ticker'] == present_ticker]['date'].tolist()
         print (date_list1)
-        date_list2 = present_ticker_df[present_ticker_df['Ticker'] == present_ticker]['Date'].tolist()
+        date_list2 = present_ticker_df[present_ticker_df['ticker'] == present_ticker]['date'].tolist()
         print (date_list2)
         # move present ticker's closing prices to a list
-        closing_list = present_ticker_df[present_ticker_df['Ticker'] == present_ticker]['Close'].tolist()
+        closing_list = present_ticker_df[present_ticker_df['ticker'] == present_ticker]['close'].tolist()
         print (closing_list)
 
         # CHANGE SO THAT USER CAN ENTER AS MANY DAY RANGES AS THEY WANT 

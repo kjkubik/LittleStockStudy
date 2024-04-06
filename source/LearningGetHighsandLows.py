@@ -54,12 +54,12 @@ from config import dbconnection
 def query_highs_and_lows():
     # TODO: 
     # INPUT
-    tickers_df = pd.read_csv("resources/InputTickersForDev.csv")
+    tickers_df = pd.read_csv("resources/InputTickers.csv")
 
     for record, row in tickers_df.iterrows():
-        ticker =  row['Ticker']
+        ticker =  row['ticker']
         print(ticker)
-        if record != 'Ticker':
+        if record != 'ticker':
     
             try:
                 # Connect to the database
@@ -87,7 +87,7 @@ def query_highs_and_lows():
                 # TODO: the right code (in GetHighs and Lows)
                 
                 high_low_df = pd.read_sql_query(select_query, conn)
-                print (high_low_df)
+                #print (high_low_df)
                 
             finally:
                 # Close the cursor and connection
@@ -111,7 +111,7 @@ def query_highs_and_lows():
         
             final_df = pd.DataFrame()  # Initialize an empty DataFrame
             final_df = final_df.append(high_low_df.iloc[-1])  # Append the last row (reversed order)
-            print(final_df)
+            #print(final_df)
             yesterdays_txt = high_low_df.iloc[-1]['high_low_txt']  # Initialize yesterdays_txt with the last row's text
 
             # Iterate through the rows of high_low_df in reverse order
@@ -121,7 +121,7 @@ def query_highs_and_lows():
                     final_df = final_df.append(row)  # Append rows to the DataFrame
                     yesterdays_txt = present_txt
 
-            print(final_df)
+            #print(final_df)
             
             # Initialize variables
             low_count = 0  # Initialize variable to count 'LOWEST' occurrences
@@ -133,14 +133,14 @@ def query_highs_and_lows():
                     low_count += 1  # Increment the count of 'LOWEST'
                     if low_count > 1:  # Check if this is not the first 'LOWEST'
                         low_distance = abs((row['date'] - prev_low_date).days)  # Calculate the absolute difference in days
-                        print(f"{prev_low_date.strftime('%Y-%m-%d')} - {row['date'].strftime('%Y-%m-%d')}: {low_distance}")
+                        print(f"{row['date'].strftime('%Y-%m-%d')} - {prev_low_date.strftime('%Y-%m-%d')}: {low_distance}")
                     prev_low_date = row['date']  # Update the previous 'LOWEST' date
             
             # Set display options to show all rows and columns
             # pd.set_option('display.max_rows', None)  # Show all rows
-            print (final_df)  
-            print ((final_df['high_low_txt'] == 'LOWEST').sum())          
-            print ((final_df['high_low_txt'] == 'HIGHEST').sum()) 
+            # print (final_df)  
+            # print ((final_df['high_low_txt'] == 'LOWEST').sum())          
+            # print ((final_df['high_low_txt'] == 'HIGHEST').sum()) 
             plot_highs_and_lows(ticker,final_df)    
         # TODO: ONCE YOU GET the dataframe right, we will put them in the high_low table and then use the high_low table to plot points on graph. 
         # TODO: put SMA on the same graph too!!! ;)
@@ -170,7 +170,7 @@ def plot_highs_and_lows(ticker,final_df):
     fig.add_trace(trace_points)
 
     # Update figure layout (optional)
-    fig.update_layout(title='High/Low and Prices' + ticker, xaxis_title='Date', yaxis_title='Value')
+    fig.update_layout(title='High/Low and Prices for ' + ticker, xaxis_title='Date', yaxis_title='Value')
 
     # Show the figure
     fig.show() 

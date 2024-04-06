@@ -1,0 +1,101 @@
+# Purpose: With large files, it is possible to sort and then delete 
+# duplicate records having ticker and date at its key.
+
+import pandas as pd
+
+def sort_file(file_path):
+    # Specify the chunk size for reading the CSV file
+    chunk_size = 10000  # Adjust the chunk size as needed based on your data size
+    
+    # Define a function to process each chunk
+    def process_chunk(chunk):
+        # Sort the chunk by 'ticker' and 'date'
+        chunk_sorted = chunk.sort_values(by=['ticker', 'date'])
+        return chunk_sorted
+    
+    # Read the CSV file in chunks and process each chunk
+    chunks = pd.read_csv(file_path, chunksize=chunk_size)
+    processed_chunks = [process_chunk(chunk) for chunk in chunks]
+    
+    # Concatenate the processed chunks into a single DataFrame
+    df_sorted = pd.concat(processed_chunks)
+    
+    # Sort the concatenated DataFrame again to ensure overall sorting
+    df_sorted = df_sorted.sort_values(by=['ticker', 'date'])
+    
+    # Write the sorted DataFrame back to the file
+    df_sorted.to_csv(file_path, index=False)
+    
+    print(f"File '{file_path}' sorted successfully.")
+    
+def remove_dups(file_path):    
+    # Specify the chunk size for reading the CSV file
+    chunk_size = 10000  # Adjust the chunk size as needed based on your data size
+    
+    # Initialize a variable to keep track of the total number of duplicates dropped
+    total_duplicates_dropped = 0
+    
+    # Define a function to process each chunk and drop duplicates
+    def process_chunk(chunk):
+        nonlocal total_duplicates_dropped  # Access the total_duplicates_dropped variable from the outer scope
+        chunk_duplicates_dropped = chunk.drop_duplicates(subset=['ticker', 'date'])
+        num_duplicates_dropped = len(chunk) - len(chunk_duplicates_dropped)
+        total_duplicates_dropped += num_duplicates_dropped
+        return chunk_duplicates_dropped
+    
+    # Read the CSV file in chunks and process each chunk
+    chunks = pd.read_csv(file_path, chunksize=chunk_size)
+    processed_chunks = [process_chunk(chunk) for chunk in chunks]
+    
+    # Concatenate the processed chunks into a single DataFrame
+    df_cleaned = pd.concat(processed_chunks)
+    
+    # Write the cleaned DataFrame back to the file
+    df_cleaned.to_csv(file_path, index=False)
+    
+    print(f"Duplicates removed from file '{file_path}' successfully.")
+    print(f"Total number of duplicates dropped: {total_duplicates_dropped}")
+    
+# MAIN
+if __name__ == '__main__':
+    file_path = 'resources/HistoricalData/CombinedStockPrices.csv'
+    #sort_file(file_path)
+    remove_dups(file_path)
+    print ('Duplicate removal has been completed.')    
+    
+# Testing completed: PASSES
+# We start with 87,301 records (including the header record)
+# We add 73,114 
+# I move all 'PLTR' records to the front of the file
+# Once sorted we can see there are duplicates for each stock: 
+# PLTR,2022-08-08,9.54,9.57,9.01,9.25,58788927.0,9.2374,171003
+# PLTR,2022-08-09,9.51,9.66,9.32,9.59,46054905.0,9.5218,116909
+# PLTR,2022-08-10,9.76,10.05,9.4,9.42,44790863.0,9.6969,115486
+# PLTR,2022-08-11,9.55,9.97,9.42,9.91,30638186.0,9.7997,79299
+# PLTR,2022-08-14,9.82,10.1,9.76,9.91,33263354.0,9.9157,89781
+# PLTR,2022-08-14,9.82,10.1,9.76,9.91,33263354.0,9.9157,89781
+# PLTR,2022-08-15,9.85,9.88,9.36,9.74,40681240.0,9.6289,103353
+# PLTR,2022-08-15,9.85,9.88,9.36,9.74,40681240.0,9.6289,103353
+# PLTR,2022-08-16,9.56,9.6188,9.33,9.43,33933634.0,9.4561,87469
+# PLTR,2022-08-16,9.56,9.6188,9.33,9.43,33933634.0,9.4561,87469
+# PLTR,2022-08-17,9.42,9.47,9.12,9.15,26365589.0,9.2227,73912
+# PLTR,2022-08-17,9.42,9.47,9.12,9.15,26365589.0,9.2227,73912
+#
+# Once remove_dups has completed, we see: Total number of duplicates dropped: 72256
+# and we can see there aren't any duplicates: 
+# PLTR,2022-08-08,9.54,9.57,9.01,9.25,58788927.0,9.2374,171003
+# PLTR,2022-08-09,9.51,9.66,9.32,9.59,46054905.0,9.5218,116909
+# PLTR,2022-08-10,9.76,10.05,9.4,9.42,44790863.0,9.6969,115486
+# PLTR,2022-08-11,9.55,9.97,9.42,9.91,30638186.0,9.7997,79299
+# PLTR,2022-08-14,9.82,10.1,9.76,9.91,33263354.0,9.9157,89781
+# PLTR,2022-08-15,9.85,9.88,9.36,9.74,40681240.0,9.6289,103353
+# PLTR,2022-08-16,9.56,9.6188,9.33,9.43,33933634.0,9.4561,87469
+# PLTR,2022-08-17,9.42,9.47,9.12,9.15,26365589.0,9.2227,73912
+# PLTR,2022-08-18,9.0,9.01,8.48,8.51,40560185.0,8.6123,126838
+# PLTR,2022-08-21,8.32,8.4,8.06,8.07,37824865.0,8.1544,104451
+# PLTR,2022-08-22,8.1,8.28,8.0,8.01,25658542.0,8.0965,71654
+# and at the end of PLTR data we see April data has been added: 
+# PLTR,2024-04-01,22.0,22.79,21.72,22.72,39770573.0,22.2648,198392
+# PLTR,2024-04-02,22.44,23.01,22.38,22.7,30357412.0,22.7471,143068
+# PLTR,2024-04-03,23.82,24.1,22.4,22.48,64995295.0,23.1265,264135
+# PLTR,2024-04-04,22.42,23.32,22.3065,22.96,38716824.0,22.9504,173942
