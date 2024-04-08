@@ -1,0 +1,115 @@
+import pandas as pd
+# import matplotlib.pyplot as plt
+import numpy as np
+import plotly.graph_objects as go
+
+# Read the tickers file into a DataFrame
+tickers_df = pd.read_csv("resources/InputTickers.csv")
+
+# Input file paths
+input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+output_file = 'resources/HistoricalData/HighsandLowsforAllTickers.csv'
+
+# Read the CSV file into a DataFrame
+df = pd.read_csv(input_file)
+
+# Working with  'ticker', 'date', and 'close' columns
+extracted_df = df[['ticker', 'date', 'close']]
+#print(extracted_df)
+
+# Initialize high_low_df with columns in extracted_df
+final_high_low_df = pd.DataFrame(columns=['ticker', 'low_date', 'low_price', 'high_date','high_price'])
+#print(final_high_low_df)
+
+# Iterate through tickers
+for ticker in tickers_df['ticker']:
+    # Input date range
+    begin_date = pd.to_datetime('2023-08-01') 
+    end_date = pd.to_datetime('2024-04-06')
+
+    # Create a copy of extracted_df for manipulation
+    ticker_rows_within_range_df = extracted_df.copy()
+
+    # Convert 'date' column to datetime format using .loc on the copied DataFrame
+    ticker_rows_within_range_df.loc[:, 'date'] = pd.to_datetime(ticker_rows_within_range_df['date'])
+
+    # Only get records within date range given using .loc on the copied DataFrame
+    ticker_rows_within_range_df = ticker_rows_within_range_df.loc[(ticker_rows_within_range_df['date'] >= begin_date) & 
+                                      (ticker_rows_within_range_df['date'] <= end_date) & 
+                                      (ticker_rows_within_range_df['ticker'] == ticker)]
+    # print(ticker_rows_within_range_df)
+    
+    # Group by 'ticker' and find the rows with the lowest and highest close prices
+    min_price_rows = ticker_rows_within_range_df.loc[ticker_rows_within_range_df.groupby('ticker')['close'].idxmin()]
+    max_price_rows = ticker_rows_within_range_df.loc[ticker_rows_within_range_df.groupby('ticker')['close'].idxmax()]
+
+    # Create a new DataFrame with the desired columns
+    price_change_df = pd.DataFrame({
+                                    'ticker': min_price_rows['ticker'].values,
+                                    'low_date': min_price_rows['date'].values,
+                                    'low_price': min_price_rows['close'].values,
+                                    'high_date': max_price_rows['date'].values,
+                                    'high_price': max_price_rows['close'].values, 
+                                    'percent_change': np.nan  # Initialize with NaN
+                                  })
+    
+    #print(price_change_df)
+    # Calculate the percentage change
+    price_change_df['percent_change'] = ((price_change_df['high_price'] - price_change_df['low_price']) / price_change_df['low_price']) * 100
+
+    # Display the updated DataFrame
+    #print(price_change_df)
+    
+    final_high_low_df = final_high_low_df.append(price_change_df)
+
+# Sort the DataFrame by low_date and high_date in ascending order
+final_high_low_df_sorted = final_high_low_df.sort_values(by=['low_date', 'low_price', 'percent_change'])  
+
+# Print the sorted DataFrame
+pd.set_option('display.max_rows', None)  # Display all rows
+print(final_high_low_df_sorted)
+    
+# Convert date columns to datetime
+final_high_low_df_sorted['low_date'] = pd.to_datetime(final_high_low_df_sorted['low_date'])
+final_high_low_df_sorted['high_date'] = pd.to_datetime(final_high_low_df_sorted['high_date'])
+
+# Determine the number of plots needed based on the length of final_high_low_df_sorted
+num_plots = (len(final_high_low_df_sorted) + 9) // 20  # Ceiling division to get the number of plots
+
+# Create and display interactive plots
+for i in range(num_plots):
+    # Get the chunk of 10 records for the current plot
+    chunk = final_high_low_df_sorted.iloc[i * 20: (i + 1) * 20]
+    
+    # Create an interactive plot for the current chunk
+    fig = go.Figure()
+    for _, row in chunk.iterrows():
+        fig.add_trace(go.Scatter(x=[row['low_date'], row['high_date']],
+                                 y=[row['low_price'], row['high_price']],
+                                 mode='lines+markers',
+                                 name=f"{row['ticker']} ({row['percent_change']:.2f}%)",  # Include percent change in legend name
+                                 hovertext=f"Ticker: {row['ticker']}<br>"
+                                           f"Low Date - Price: {row['low_date'].strftime('%m-%d-%Y')} - ${row['low_price']}<br>"
+                                           f"High Date - Price: {row['high_date'].strftime('%m-%d-%Y')} - ${row['high_price']}<br>"
+                                           f"Percent Change: {row['percent_change']:.2f}%",
+                                 hoverinfo='text'))
+
+    # Generate tick values and tick labels for the x-axis
+    x_tickvals = pd.date_range(start=chunk['low_date'].min(), end=chunk['high_date'].max(), freq='5D')
+    x_ticktext = [date.strftime('%m-%d-%Y') for date in x_tickvals]
+
+    # Generate tick values and tick labels for the y-axis
+    y_tickvals = np.arange(0, chunk['high_price'].max() + 50, 50)
+    y_ticktext = ['$' + str(val) for val in y_tickvals]
+
+    # Update layout for the current plot
+    fig.update_layout(title=f'Low and High Prices by Ticker (Plot {i+1})',
+                      xaxis_title='Date',
+                      yaxis_title='Price',
+                      xaxis=dict(tickvals=x_tickvals, ticktext=x_ticktext),  # Add tick marks for every 5 days and format dates as mm-dd-yyyy
+                      yaxis=dict(tickvals=y_tickvals, ticktext=y_ticktext),  # Add $50 increments to y-axis
+                      hovermode='closest',
+                      showlegend=True)
+
+    # Show the plot
+    fig.show()
