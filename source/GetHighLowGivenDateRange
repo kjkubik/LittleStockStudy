@@ -3,8 +3,12 @@ import pandas as pd
 import plotly.graph_objects as go
 import pandas as pd
 import csv
+import matplotlib.pyplot as plt
 
 def house_keeping():
+    # INPUT
+    tickers_df = pd.read_csv("resources/InputTickers.csv")
+    
     # INPUT
     input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
     # OUTPUT
@@ -31,33 +35,60 @@ def house_keeping():
     
     # Reset the index of the DataFrame
     analysis_record_df.reset_index(drop=True, inplace=True)
-    
-    # # Find the row with the lowest close amount
-    # lowest_close_row = analysis_record_df.loc[analysis_record_df['close'].idxmin()]
-    # print(lowest_close_row)
-
-    # # Find the row with the highest close amount
-    # highest_close_row = analysis_record_df.loc[analysis_record_df['close'].idxmax()]
-    # print(highest_close_row)
+    #print(analysis_record_df)
     
     # Find the row with the lowest close amount
     lowest_close_row = analysis_record_df[analysis_record_df['close'] == analysis_record_df['close'].min()]
-    print(lowest_close_row)
+    #print(lowest_close_row)
     
     # Find the row with the highest close amount
     highest_close_row = analysis_record_df[analysis_record_df['close'] == analysis_record_df['close'].max()]
-    print(highest_close_row)
+    #print(highest_close_row)
 
+    # Calculate the percentage change
+    beginning_price = lowest_close_row['close'].iloc[0]
+    ending_price = highest_close_row['close'].iloc[0]
+    percentage_change = ((ending_price - beginning_price) / beginning_price) * 100
+    #print(f"percent change: {percentage_change}")
+    
     # Create a new DataFrame with the lowest and highest close rows
     highest_lowest_df = pd.concat([lowest_close_row, highest_close_row]).reset_index(drop=True)
+    #print(highest_lowest_df)
+    
+    # Assign the percentage_change to the 'percentage_change' column of the second row
+    highest_lowest_df.loc[1, 'percentage_change'] = percentage_change
+
     print(highest_lowest_df)
     
-    # Calculate the difference between the highest and lowest close amounts
-    difference = highest_lowest_df.loc[1, 'close'] - highest_lowest_df.loc[0, 'close']
+    # Assuming highest_lowest_df is your DataFrame containing the data
+    plt.figure(figsize=(10, 6))
+    plt.plot(highest_lowest_df['date'], highest_lowest_df['close'], label='Close Price: ' + ticker)
+    # Add a legend with loc='upper left' to specify the position
+    plt.legend(loc='upper left')
 
-    # Display the difference
-    print("The difference between the highest and lowest close amounts is:", difference)
+    # Calculate the midpoint of the line segment
+# midpoint_index = len(x_values) // 2  # Assuming the line has an odd number of points
+# mid_x = (x_values[midpoint_index] + x_values[midpoint_index + 1]) / 2
+# mid_y = (y_values[midpoint_index] + y_values[midpoint_index + 1]) / 2
+
+    # Add text annotation for percentage change
+    plt.text(highest_lowest_df['date'].iloc[1], highest_lowest_df['close'].iloc[1], 
+         f'Percent change for {highest_lowest_df["ticker"].iloc[1]}: {highest_lowest_df["percentage_change"].iloc[1]:.2f}%', 
+         fontsize=8, ha='center', va='bottom')
     
+    # Set labels and title
+    plt.xlabel('Date')
+    plt.ylabel('Close Price')
+    plt.title('Stock Close Price with Percentage Change Annotation')
+
+    # Add legend
+    plt.legend()
+
+    # Show plot
+    plt.show()    
+    # Calculate the difference between the highest and lowest close amounts
+    # difference = highest_lowest_df.loc[1, 'close'] - highest_lowest_df.loc[0, 'close']
+    # print(f"difference: {difference}")
     
     # # Create a new DataFrame with the lowest and highest close rows
     # highest_lowest_df = pd.concat([lowest_close_row, highest_close_row], axis=1).T

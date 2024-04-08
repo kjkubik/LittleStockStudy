@@ -15,8 +15,8 @@ import datetime
 import time
 from config import stock_key
 from TableFunctions import stocks_to_tables
-from Backup_Files import backup_input_tickers
-from Backup_Files import backup_daily
+from source.FileFunctions import backup_input_tickers
+from source.FileFunctions import backup_daily
 
 def daily_run():
     print('Starting GetAllStocksData')
@@ -161,6 +161,5 @@ if __name__ == '__main__':
     
     daily_run() 
     
-    backup_input_tickers()
-    backup_daily()
-    # stocks_to_tables() 
+    # After daily_run completes, run FileFunctions
+    
