@@ -54,7 +54,7 @@ from config import dbconnection
 def query_highs_and_lows():
     # TODO: 
     # INPUT
-    tickers_df = pd.read_csv("resources/InputTickers.csv")
+    tickers_df = pd.read_csv("resources/InputTickersTESTING.csv")
 
     for record, row in tickers_df.iterrows():
         ticker =  row['ticker']
