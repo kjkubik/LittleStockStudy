@@ -63,7 +63,8 @@ def move_csv_to_daily_stock_data(input_file, file_date, time_frame):
 
         # Open the CSV file for reading
         # INPUT file
-        input_file = "resources/HistoricalData/StockPricesTodays" + time_frame + ".csv"
+        # input_file = "resources/HistoricalData/Year2010-2020.csv"
+        #input_file = "resources/HistoricalData/StockPricesTodays" + time_frame + ".csv"
         print(input_file)
         
         
@@ -88,5 +89,5 @@ def move_csv_to_daily_stock_data(input_file, file_date, time_frame):
 if __name__ == '__main__':
     
     # stocks_to_tables(input_file = "resources/HistoricalData/SendToDatabase.csv")
-    stocks_to_tables()
+    stocks_to_tables(input_file = "resources/HistoricalData/Year2010-2020.csv")
     print ('All data in tables. Processing Complete')
