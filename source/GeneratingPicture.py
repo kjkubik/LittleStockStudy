@@ -4,6 +4,9 @@ import numpy
 from PIL import Image, ImageDraw 
 import time
 
+
+# Purpose: Generate random colored squares on screen
+ 
 #output_image = uuid.uuid1()
 # image
 output_image = Image.open("./resources/outputPicture.png")

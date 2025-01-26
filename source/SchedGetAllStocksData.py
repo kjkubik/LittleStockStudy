@@ -1,7 +1,7 @@
 # scheduler.py
 import schedule
 import time
-from GetAllStocksDatas import daily_run
+from source.ArchivedSource.GetAllStocksDatas2 import daily_run
 from config import stock_key
 
 # Schedule the task to run daily at a specific time (e.g., 9:00 AM)

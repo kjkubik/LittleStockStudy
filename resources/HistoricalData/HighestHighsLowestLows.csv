@@ -101,3 +101,5 @@ PLTR,2024-02-04 00:00:00,16.72,low,0.0
 PLTR,2024-02-14 00:00:00,25.41,high,51.97368421052633
 PLTR,2024-03-06 00:00:00,26.46,high,12.643678160919553
 PLTR,2024-03-14 00:00:00,23.49,low,0.0
+ticker,date,close,high_low,percent_change
+ticker,date,close,high_low,percent_change

@@ -1,0 +1,23 @@
+
+
+import shutil
+from datetime import datetime
+
+def backup_file(file_path):
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    
+    # Create a backup file name with timestamp
+    #bu_file = f"resources/InputTickers_{timestamp}.csv"
+    bu_file = f"{file_path}_{timestamp}.csv"
+    file_path = f"{file_path}.csv"
+    
+    try:
+        # Copy the original file to the backup location
+        shutil.copyfile(file_path, bu_file)
+        print (f"Back-up file successfully created: {bu_file} ")
+    
+    except Exception as e:
+        print(f"Error creating backup: {e}")
+
+backup_file('resources/HistoricalData/StockResponse')

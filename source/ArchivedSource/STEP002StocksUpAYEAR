@@ -1,0 +1,78 @@
+import pandas as pd
+from pandas.tseries.holiday import USFederalHolidayCalendar
+from datetime import timedelta
+
+# Load the stock data into a pandas DataFrame
+data = pd.read_csv('resources/HistoricalData/StockResponse.csv', parse_dates=['date'])
+
+# Ensure data is sorted by ticker and date (important for time-based comparisons)
+data.sort_values(by=['ticker', 'date'], ascending=True, inplace=True)
+
+# Get today's date (start date)
+#start_date = pd.to_datetime('today')
+start_date = pd.to_datetime('11/17/2024')
+
+# Calculate the date 365 days ago (end date)
+end_date = start_date - timedelta(days=365)
+
+# Generate a list of U.S. federal holidays between today and 365 days ago
+cal = USFederalHolidayCalendar()
+holidays = cal.holidays(start=end_date, end=start_date).to_pydatetime()
+
+# Convert holidays list to a set of datetime objects for faster lookup
+holiday_set = set(holidays)
+
+# Generate a list of all weekdays in the range (Monday=0, Sunday=6)
+all_weekdays = pd.date_range(start=end_date, end=start_date, freq='B')
+
+# Now count how many of the weekdays are not in the holidays set
+valid_weekdays = [date for date in all_weekdays if date not in holiday_set]
+
+# The number of valid weekdays is the length of valid_weekdays
+print(f"Number of weekdays excluding weekends and holidays: {len(valid_weekdays)}")
+
+valid_days = len(valid_weekdays)
+
+# Function to check if the stock has gone down over the last 365 days
+def check_price_increase(data, days=valid_days):
+    count_stocks_moved = 0
+    # Group data by ticker
+    grouped = data.groupby('ticker')
+    #print(grouped)
+
+    # Open the file to write once, using 'w' for write mode
+    with open('resources/HistoricalData/UpAYear.csv', 'w') as f:
+        # Write the header to the CSV file
+        f.write("ticker,date,close\n")
+        
+        # Loop through each ticker group
+        for ticker, ticker_data in grouped:
+            #print(ticker)
+            # Loop through the data starting from the 365th row (index 699) because we need at least 365 days
+            for i in range(days - 1, len(ticker_data)):
+                
+                from datetime import datetime, timedelta
+
+                # Get the closing price 7 days ago and today
+                price_365_days_ago = ticker_data.iloc[i - (days - 1)]['close']
+                
+                current_price = ticker_data.iloc[i]['close']
+                
+                # the ratio needs to be between .66 and .95 for me to pay attention to
+                ratio = current_price/price_365_days_ago
+                #print(ratio)
+                # If the price has increased over the last 365 days, we will keep all records for analysis
+                if (current_price > price_365_days_ago) and (ratio > 1.75) and (ratio < 5.0):
+                            #print(price_365_days_ago)
+                            #print(current_price)
+                            print(ratio)                
+                            count_stocks_moved += 1
+                            for j in range(len(ticker_data)):
+                                # Write each record for the ticker to the CSV file
+                                f.write(f"{ticker_data.iloc[j]['ticker']},{ticker_data.iloc[j]['date']},{ticker_data.iloc[j]['close']}\n")
+                            print(f"All records for {ticker} written to 'UpAYear.csv'.")
+                            break  # No need to check further for this ticker once we've written all its records
+    print(count_stocks_moved)                
+
+# Example usage: Check price drop for all tickers
+check_price_increase(data)

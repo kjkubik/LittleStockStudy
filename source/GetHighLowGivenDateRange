@@ -10,7 +10,7 @@ def house_keeping():
     tickers_df = pd.read_csv("resources/InputTickers.csv")
     
     # INPUT
-    input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+    input_file = 'resources/HistoricalData/CombinedStockPricesTEST.csv'
     # OUTPUT
     output_file = 'resources/HistoricalData/HighsandLowsforAllTickers.csv'
 
@@ -18,7 +18,7 @@ def house_keeping():
     ticker = 'PLTR'
     # Input date range
     begin_date = pd.to_datetime('2022-03-29') 
-    end_date = pd.to_datetime('2024-04-06')
+    end_date = pd.to_datetime('2024-10-16')
         
     # Read the input_file into a DataFrame
     df = pd.read_csv(input_file)

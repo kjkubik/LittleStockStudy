@@ -4,59 +4,62 @@
 # note: examples of how to use function(s) are at end of module                  #
 # ################################################################################
 
-import csv
+# START COMMENT
+# 
+# import csv
 
-def file_operations(from_script, file_path, mode, data=None, has_header=False):
-    try:
-        if mode not in ['r', 'w', 'a']:
-            data = "Invalid mode. Supported modes are 'r', 'w', and 'a'."
-            print(data)  # Print data value after return
-            return data
+# def file_operations(from_script, file_path, mode, data=None, has_header=False):
+#     try:
+#         if mode not in ['r', 'w', 'a']:
+#             data = "Invalid mode. Supported modes are 'r', 'w', and 'a'."
+#             print(data)  # Print data value after return
+#             return data
 
-        if mode == 'r':
-            # Read mode
-            with open(file_path, 'r', newline='') as file:
-                if file_path.endswith('.csv'):
-                    reader = csv.reader(file)
-                    if has_header:
-                        next(reader)  # Skip header row
-                    data = list(reader)
-                else:
-                    data = file.read()
-        elif mode == 'w':
-            # Write mode
-            with open(file_path, 'w', newline='') as file:
-                if file_path.endswith('.csv'):
-                    writer = csv.writer(file)
-                    if has_header:
-                       # writer.writerow(data[0])  # Write header row
-                        writer.writerows(data[1:])  # Write data rows
-                    else:
-                        writer.writerows(data)
-                else:
-                    file.write(data)
-            data = "Data written successfully. "
-        elif mode == 'a':
-            # Append mode
-            with open(file_path, 'a', newline='') as file:
-                if file_path.endswith('.csv'):
-                    writer = csv.writer(file)
-                    if has_header:
-                        writer.writerows(data[1:])  # Append data rows only
-                    else:
-                        writer.writerows(data)
-                else:
-                    file.write(data)
-            data = "Data appended successfully. "
+#         if mode == 'r':
+#             # Read mode
+#             with open(file_path, 'r', newline='') as file:
+#                 if file_path.endswith('.csv'):
+#                     reader = csv.reader(file)
+#                     if has_header:
+#                         next(reader)  # Skip header row
+#                     data = list(reader)
+#                 else:
+#                     data = file.read()
+#         elif mode == 'w':
+#             # Write mode
+#             with open(file_path, 'w', newline='') as file:
+#                 if file_path.endswith('.csv'):
+#                     writer = csv.writer(file)
+#                     if has_header:
+#                        # writer.writerow(data[0])  # Write header row
+#                         writer.writerows(data[1:])  # Write data rows
+#                     else:
+#                         writer.writerows(data)
+#                 else:
+#                     file.write(data)
+#             data = "Data written successfully. "
+#         elif mode == 'a':
+#             # Append mode
+#             with open(file_path, 'a', newline='') as file:
+#                 if file_path.endswith('.csv'):
+#                     writer = csv.writer(file)
+#                     if has_header:
+#                         writer.writerows(data[1:])  # Append data rows only
+#                     else:
+#                         writer.writerows(data)
+#                 else:
+#                     file.write(data)
+#             data = "Data appended successfully. "
             
-        print(f'{from_script}: Result: {data}, Mode: {mode}')  # Print data value after return
-        return data
-    except FileNotFoundError:
-        return f"File not found: {file_path}"
-    except Exception as e:
-        return f"Error: {str(e)}"
+#         print(f'{from_script}: Result: {data}, Mode: {mode}')  # Print data value after return
+#         return data
+#     except FileNotFoundError:
+#         return f"File not found: {file_path}"
+#     except Exception as e:
+#         return f"Error: {str(e)}"
+# STOP COMMENT
 
-
+#------------------------------------------ 
 # TEST ALL SCENARIOS
 
 # Attempt using wrong mode - PASS

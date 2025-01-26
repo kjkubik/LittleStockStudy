@@ -1,12 +1,15 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
+import plotly.graph_objects as go 
 
 # Read the tickers file into a DataFrame
 tickers_df = pd.read_csv("resources/InputTickers.csv")
 
 # Input file paths
-input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+#input_file = 'resources/HistoricalData/CombinedStockPrices.csv'
+input_file = 'resources/your_data.csv'
+
 output_file = 'resources/HistoricalData/HighsandLowsforAllTickers.csv'
 
 # Read the CSV file into a DataFrame
@@ -23,8 +26,8 @@ final_high_low_df = pd.DataFrame(columns=['ticker', 'low_date', 'low_price', 'hi
 # Iterate through tickers
 for ticker in tickers_df['ticker']:
     # Input date range
-    begin_date = pd.to_datetime('2023-10-01') 
-    end_date = pd.to_datetime('2024-04-06')
+    begin_date = pd.to_datetime('2010-10-01') 
+    end_date = pd.to_datetime('2024-10-06')
 
     # Create a copy of extracted_df for manipulation
     ticker_rows_within_range_df = extracted_df.copy()
@@ -55,11 +58,15 @@ for ticker in tickers_df['ticker']:
     #print(price_change_df)
     # Calculate the percentage change
     price_change_df['percent_change'] = ((price_change_df['high_price'] - price_change_df['low_price']) / price_change_df['low_price']) * 100
+    
+    price_change_df['percent_change'] = ((price_change_df['high_price'] - price_change_df['low_price']) / price_change_df['low_price']) * 100
+
 
     # Display the updated DataFrame
     #print(price_change_df)
     
-    final_high_low_df = final_high_low_df.append(price_change_df)
+    # final_high_low_df = final_high_low_df.append(price_change_df)
+    final_high_low_df = pd.concat([final_high_low_df, price_change_df], ignore_index=True)
 
 # Sort the DataFrame by low_date and high_date in ascending order
 final_high_low_df_sorted = final_high_low_df.sort_values(by=['low_date', 'low_price', 'percent_change'])  
@@ -67,10 +74,45 @@ final_high_low_df_sorted = final_high_low_df.sort_values(by=['low_date', 'low_pr
 # Print the sorted DataFrame
 pd.set_option('display.max_rows', None)  # Display all rows
 print(final_high_low_df_sorted)
-    
+####################################################################
+# Assuming final_high_low_df_sorted already exists with your data
+df = final_high_low_df_sorted
+
 # Convert date columns to datetime
-final_high_low_df_sorted['low_date'] = pd.to_datetime(final_high_low_df_sorted['low_date'])
-final_high_low_df_sorted['high_date'] = pd.to_datetime(final_high_low_df_sorted['high_date'])
+df['low_date'] = pd.to_datetime(df['low_date'])
+df['high_date'] = pd.to_datetime(df['high_date'])
+
+# Create a figure for the plot
+plt.figure(figsize=(10, 6))
+
+# Plotting highs and lows for each ticker, only if percent_change > 0
+for i in range(len(df)):
+    ticker = df['ticker'].iloc[i]
+    percent_change = df['percent_change'].iloc[i]
+    
+    # Only plot if percent_change is positive
+    if percent_change > 0:
+        plt.plot([df['low_date'].iloc[i], df['high_date'].iloc[i]], 
+                 [df['low_price'].iloc[i], df['high_price'].iloc[i]], 
+                 marker='o', label=f"{ticker}: {percent_change:.2f}%")
+    
+# Adding labels and title
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('High and Low Prices for Each Ticker')
+
+# Adding the legend in the upper right corner, only for positive percent change
+plt.legend(loc='upper right', title="Ticker: Percent Change")
+
+# Formatting the x-axis dates
+plt.xticks(rotation=45)
+
+# Adding grid for clarity
+plt.grid(True)
+
+# Adjust layout and show the plot
+plt.tight_layout()
+plt.show()    
 
 # Determine the number of plots needed based on the length of final_high_low_df_sorted
 num_plots = (len(final_high_low_df_sorted) + 9) // 20  # Ceiling division to get the number of plots
@@ -112,3 +154,4 @@ for i in range(num_plots):
 
     # Show the plot
     fig.show()
+
