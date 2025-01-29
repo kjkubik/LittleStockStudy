@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # Assuming you already have a DataFrame `df` with columns ['ticker', 'date', 'percent_change']
-df = pd.read_csv('resources/HistoricalData/extremesGone.csv')
+df = pd.read_csv('resources/HistoricalData/directional.csv')
 # Step 1: Ensure 'date' is in datetime format
 df['date'] = pd.to_datetime(df['date'])
 

@@ -1,4 +1,4 @@
-# Purpose: creates a dataframe containing a record for each day giving whether the price was closeer or lower.
+# Purpose: creates a dataframe containing a record for each day giving whether the price was higher or lower.
 
 import pandas as pd
 import numpy as np  # Import NumPy for np.select
