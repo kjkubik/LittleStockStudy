@@ -1,13 +1,6 @@
 # Adding config.py file.
 config.py
-accumulated_data.csv
-accumulated_dataSTEP004.csv
-all_qualifying_stocks.csv
-directional.csv
-extremes.csv
-extremesGone.csv
-filtered_stocks_data.csv
-filtered_stocks.csv
+resources/
 
 
 # Byte-compiled / optimized / DLL files
