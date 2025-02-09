@@ -1,7 +1,10 @@
 # Adding config.py file.
 config.py
 resources/
+<<<<<<< HEAD
 
+=======
+>>>>>>> ddaf2bf48aa2de91a45bfe9d150484ba136c206a
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
