@@ -9,37 +9,95 @@ tickers_df = pd.read_csv("resources/InputTickers.csv")
 stock_close_data_df = stock_response_df[['ticker', 'date', 'close']]
 #print(stock_close_data_df)
 
-# 2. add columns and initialized
-init_stock_data_df = stock_close_data_df.assign(
-    percent_change=stock_close_data_df.groupby('ticker')['close'].pct_change() * 100,
-    end_date=99999999,
-    consecutive_days=0,
-    total_percent_change=0.00)
+# 2. change date to start_date
+stock_close_data_df = stock_close_data_df.rename(columns={'date': 'start_date'})
 
-print(init_stock_data_df)
+# 3. find percent change
+percent_change_df = stock_close_data_df.assign(percent_change=stock_close_data_df.groupby('ticker')['close'].pct_change() * 100)
 
-# # 3. find percent change
-# init_stock_data_df['percent_change'] = init_stock_data_df.groupby('ticker')['close'].pct_change() * 100
-# print(init_stock_data_df)
+# NaN to 0.00
+percent_change_df['percent_change'] = percent_change_df['percent_change'].fillna(0)
+
+# 4. remove the close column
+percent_change_df = percent_change_df.drop('close', axis = 1) 
+print(percent_change_df.head(50)) 
+print(percent_change_df.tail(50)) 
+
+# 5. Create a dataframe with ticker, start_date, end_date, consecutive_days, 'total_percentage_change'
+columns = ['ticker', 'start_date', 'end_date', 'consecutive_days', 'total_percentage_change']
+total_changes_list = []
+
+first_ticker_flag = True
+
+total_percentage_change = 0.00
+
+for i in range(1, len(tickers_df)): 
+    ticker = tickers_df.iloc[i]['ticker']  # Get the ticker for the current row
+    print(ticker)
+    sign_change = ' '
+    
+    for j in range(1, len(percent_change_df)): 
+        if percent_change_df['ticker'].iloc[j] == ticker:
+            if first_ticker_flag: # this is the first record in the file
+                # initialize values for dataframe
+                saved_start_date = percent_change_df['start_date'].iloc[j]
+                saved_end_date = saved_start_date 
+                consecutive_days = 1
+                total_percentage_change = percent_change_df['percent_change'].iloc[j]
+                
+                first_ticker_flag = False
+                # we are about to read the rest of the records in a set of tickers, 
+                # we need to know the next records percent_change_sign before we start
+                last_sign_change = True if percent_change_df['percent_change'].iloc[j+1] > 0 else False
+                
+            else:
+                if percent_change_df['percent_change'].iloc[j] == 0.00: # we are on the first record for a ticker
+                    # save off values for last ticker
+                    total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
+                    # we are about to read the rest of the records in a set of tickers, 
+                    # we need to know the next records percent_change_sign before we start
+                    last_sign_change = True if percent_change_df['percent_change'].iloc[j+1] > 0 else False
+                
+                    # initialize values for dataframe
+                    saved_start_date = percent_change_df['start_date'].iloc[j]
+                    saved_end_date = saved_start_date 
+                    consecutive_days = 1
+                    total_percentage_change = percent_change_df['percent_change'].iloc[j]
+                    
+                    #print(saved_start_date)
+                    
+                else: # rest of records
+                    # find if the record has a neg or pos percent
+                    sign_change = True if percent_change_df['percent_change'].iloc[j] > 0 else False
+                    
+                    if last_sign_change == sign_change: 
+                        
+                        saved_end_date = percent_change_df['start_date'].iloc[j] # when there's a change we have last date saved
+                        # accumulate
+                        consecutive_days += 1
+                        total_percentage_change += percent_change_df['percent_change'].iloc[j]
+                        
+                        # save off sign_change
+                        last_sign_change = sign_change
+                        
+                    else: # the sign has changed
+                        # save values
+                        total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
+                        
+                        # initialize values for dataframe
+                        saved_start_date = percent_change_df['start_date'].iloc[j]
+                        saved_end_date = saved_start_date 
+                        consecutive_days = 1
+                        total_percentage_change = percent_change_df['percent_change'].iloc[j]
+                        
+# save the final row for the last streak of consecutive days
+total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
+
+# Convert the list of results into a DataFrame
+total_changes_df = pd.DataFrame(total_changes_list, columns=columns)
 
 
-
-# # 3. change data to start_date and add column end date. initialize the end date to 99999999
-# # Rename 'date' column to 'start_date'
-# stock_close_data_df.rename(columns={'date': 'start_date'}, inplace=True)
-
-# # Add 'end_date' column and initialize it to 99999999
-
-
-# # Now stock_close_data has 'start_date' and 'end_date' columns
-# print(stock_close_data_df)
-
-# # Rearrange columns to the desired order
-# stock_close_data_df = stock_close_data_df[['ticker', 'start_date', 'end_date', 'close', 'percent_change']]
-# print(stock_close_data_df)
-
-
-
-# # 3. for each stock, capture the start date and end date and add up the total percent change for consecutive days the percent change went up or down 
-
-# stock_percent_accumulated = 
+print(total_changes_df.head(50)) 
+print(total_changes_df.tail(50))                       
+    
+                
