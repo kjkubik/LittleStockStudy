@@ -1,6 +1,6 @@
 # Adding config.py file.
 config.py
-resources/
+resources/HistoricalData/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
