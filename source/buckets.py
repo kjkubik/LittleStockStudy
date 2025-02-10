@@ -57,8 +57,9 @@ for i in range(0, len(tickers_df)):
                 
             else:
                 if percent_change_df['percent_change'].iloc[j] == 0.00: # we are on the first record for a ticker
-                    # save off values for last ticker
-                    total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
+                    if (saved_start_date != 99999999 and saved_end_date != 99999999):
+                        # save off values for last ticker
+                        total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
                     
                     # we are about to read the rest of the records in a set of tickers, 
                     # we need to know the next records percent_change_sign before we start
@@ -84,9 +85,10 @@ for i in range(0, len(tickers_df)):
                         last_sign_change = sign_change
                         
                     else: # the sign has changed
-                        # save values
-                        total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
-                        
+                        if (saved_start_date != 99999999 and saved_end_date != 99999999):
+                            # save values
+                            total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
+                            
                         # initialize values for dataframe
                         saved_start_date = percent_change_df['start_date'].iloc[j]
                         saved_end_date = saved_start_date 
@@ -95,13 +97,34 @@ for i in range(0, len(tickers_df)):
                         last_sign_change = sign_change
                         
 # save the final row for the last streak of consecutive days
-total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
+if (saved_start_date != 99999999 and saved_end_date != 99999999): 
+    total_changes_list.append([ticker, saved_start_date, saved_end_date, consecutive_days, total_percentage_change])
 
 # Convert the list of results into a DataFrame
 total_changes_df = pd.DataFrame(total_changes_list, columns=columns)
 
 
 print(total_changes_df.head(50)) 
-#print(total_changes_df.tail(50))                       
+print(total_changes_df.tail(50))  
+total_changes_df.to_csv('resources/HistoricalData/total_changes.csv', index=False)                     
     
-                
+# 6. for each ticket give the record with the lowest low for the month
+
+# Convert 'start_date' to datetime (if it's not already in datetime format)
+total_changes_df['start_date'] = pd.to_datetime(total_changes_df['start_date'], format='%Y%m%d')
+
+# Extract the year and month from the 'start_date' column and create a new 'month_year' column
+total_changes_df['month_year'] = total_changes_df['start_date'].dt.to_period('M')
+
+# Group by 'ticker' and 'month_year' to get the lowest percentage change for each month per ticker
+lowest_changes_df = total_changes_df.loc[total_changes_df.groupby(['ticker', 'month_year'])['total_percentage_change'].idxmin()]
+
+# Sort by 'start_date' in ascending order (you can change ascending=False if you want descending order)
+lowest_changes_sorted_df = lowest_changes_df.sort_values(by='start_date')
+
+# Display the sorted results
+print(lowest_changes_sorted_df[['ticker', 'month_year', 'start_date', 'total_percentage_change']])
+
+
+lowest_changes_sorted_df[['ticker', 'month_year', 'start_date', 'total_percentage_change']].to_csv('resources/HistoricalData/lowest_changes_sorted.csv', index=False)
+
